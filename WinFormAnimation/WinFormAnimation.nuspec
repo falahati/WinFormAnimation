@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>WinFormAnimation</id>
+    <version>1.0.0.0</version>
+    <title>Simple Animation Library</title>
+    <authors>Soroush Falahati</authors>
+    <owners>Soroush Falahati</owners>
+    <licenseUrl>https://github.com/falahati/WinFormAnimation/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/falahati/WinFormAnimation</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Simple Animation Library for Winform</description>
+  </metadata>
+  <files>
+    <file src="bin\Release\WinFormAnimation.dll" target="lib\net35\WinFormAnimation.dll" />
+    <file src="bin\Release\WinFormAnimation.dll" target="lib\net40\WinFormAnimation.dll" />
+    <file src="bin\Release\WinFormAnimation.dll" target="lib\net45\WinFormAnimation.dll" />
+  </files>
+</package>
