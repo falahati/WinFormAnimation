@@ -5,7 +5,7 @@ Simple library for animating controls/values in .Net Windows Form (.Net 3.5 and 
 
 Keyframe (Path) based and fully customizable
 
-http://feed.nuget.org/packages/WinFormAnimation/
+https://www.nuget.org/packages/WinFormAnimation/
 
 License
 =============
