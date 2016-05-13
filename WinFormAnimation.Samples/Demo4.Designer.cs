@@ -1,4 +1,4 @@
-﻿namespace Demo
+﻿namespace WinFormAnimation.Samples
 {
     partial class Demo4
     {

@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using WinFormAnimation;
 
-namespace Demo
+namespace WinFormAnimation.Samples
 {
     public partial class Demo1 : UserControl
     {
-        Animator ani = new Animator();
+        private readonly Animator ani = new Animator();
+
         public Demo1()
         {
             InitializeComponent();

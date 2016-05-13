@@ -1,4 +1,4 @@
-﻿namespace Demo
+﻿namespace WinFormAnimation.Samples
 {
     partial class frm_Main
     {
@@ -31,10 +31,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.demo31 = new Demo.Demo3();
-            this.demo21 = new Demo.Demo2();
-            this.demo11 = new Demo.Demo1();
-            this.demo41 = new Demo.Demo4();
+            this.demo31 = new WinFormAnimation.Samples.Demo3();
+            this.demo21 = new WinFormAnimation.Samples.Demo2();
+            this.demo11 = new WinFormAnimation.Samples.Demo1();
+            this.demo41 = new WinFormAnimation.Samples.Demo4();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -124,7 +124,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frm_Main";
-            this.Text = "Demo";
+            this.Text = "WinForm Animation Library Samples";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

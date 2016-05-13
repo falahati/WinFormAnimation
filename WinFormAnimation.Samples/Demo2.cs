@@ -1,23 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using WinFormAnimation;
 
-namespace Demo
+namespace WinFormAnimation.Samples
 {
     public partial class Demo2 : UserControl
     {
-        Animator2D ani = new Animator2D(WinFormAnimation.Timer.FpsLimiter.Fps100);
+        private readonly Animator2D ani = new Animator2D(Timer.FpsLimiter.Fps100);
+
         public Demo2()
         {
             InitializeComponent();
             ani.SetPaths(new Path2D(70, 320, 5, 115, 2000, 2000, 0, 0, Functions.CubicEaseOut, Functions.CubicEaseIn),
-                         new Path2D(320, 70, 115, 5, 2000, 1700, 300, 600, Functions.Liner, Functions.CubicEaseInOut));
+                new Path2D(320, 70, 115, 5, 2000, 1700, 300, 600, Functions.Liner, Functions.ExponentialEaseInOut));
         }
 
         private void btn_play_Click(object sender, EventArgs e)

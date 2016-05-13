@@ -7,8 +7,8 @@
     <ProjectGuid>{EF38FA05-26F0-49DB-A18F-4C5B6303C77A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Demo</RootNamespace>
-    <AssemblyName>Demo</AssemblyName>
+    <RootNamespace>WinFormAnimation.Samples</RootNamespace>
+    <AssemblyName>WinFormAnimation.Samples</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
