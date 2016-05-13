@@ -1,19 +1,17 @@
-<?xml version="1.0"?>
-<package >
-  <metadata>
-    <id>WinFormAnimation</id>
-    <version>1.0.0.0</version>
-    <title>Simple Animation Library</title>
-    <authors>Soroush Falahati</authors>
-    <owners>Soroush Falahati</owners>
-    <licenseUrl>https://github.com/falahati/WinFormAnimation/blob/master/LICENSE.txt</licenseUrl>
-    <projectUrl>https://github.com/falahati/WinFormAnimation</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Simple Animation Library for Winform</description>
-  </metadata>
-  <files>
-    <file src="bin\Release\WinFormAnimation.dll" target="lib\net35\WinFormAnimation.dll" />
-    <file src="bin\Release\WinFormAnimation.dll" target="lib\net40\WinFormAnimation.dll" />
-    <file src="bin\Release\WinFormAnimation.dll" target="lib\net45\WinFormAnimation.dll" />
-  </files>
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>WinFormAnimation</id>
+        <version>0.0</version>
+        <title>A simple keygrame (Path) based animation library (.Net3.5+)</title>
+        <authors>Soroush Falahati</authors>
+        <licenseUrl>https://github.com/falahati/WinFormAnimation/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/falahati/WinFormAnimation</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A simple library for animating controls/values in .Net WinForm using keyframes (.Net 3.5 and later).</description>
+        <language>en-US</language>
+    </metadata>
+    <files>
+		<file src="readme.txt" target="" />
+    </files>
 </package>
