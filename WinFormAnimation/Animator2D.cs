@@ -1,451 +1,459 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Animator2D.cs" company="Soroush Falahati (soroush@falahati.net)">
-//   This library is free software; you can redistribute it and/or
-//   modify it under the terms of the GNU Lesser General Public
-//   License as published by the Free Software Foundation; either
-//   version 2.1 of the License, or (at your option) any later version.
-//   
-//   This library is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//   Lesser General Public License for more details.
-// </copyright>
-// <summary>
-//   The 2D animator class
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace WinFormAnimation
 {
-    #region
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    #endregion
-
     /// <summary>
-    /// The 2D animator class
+    ///     The two dimensional animator class, useful for animating values
+    ///     created from two underlying values
     /// </summary>
-    public class Animator2D
+    public class Animator2D : IAnimator
     {
-        #region Fields
-
         /// <summary>
-        /// The key frames / paths
-        /// </summary>
-        private readonly List<Path2D> paths = new List<Path2D>();
-
-        /// <summary>
-        /// The X value.
-        /// </summary>
-        private float? x;
-
-        /// <summary>
-        /// The Y value.
-        /// </summary>
-        private float? y;
-
-        /// <summary>
-        /// Is animation ended?
-        /// </summary>
-        private bool ended;
-
-        /// <summary>
-        /// The ending invoker.
-        /// </summary>
-        private SafeInvoker endInvoker;
-
-        /// <summary>
-        /// The frame tick invoker.
-        /// </summary>
-        private SafeInvoker frameInvoker;
-
-        /// <summary>
-        /// The underlying object for setting property.
-        /// </summary>
-        private object underlyingObject;
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Animator2D"/> class.
-        /// </summary>
-        /// <param name="maxFps">
-        /// The max fps.
-        /// </param>
-        public Animator2D(Timer.FpsLimiter maxFps = Timer.FpsLimiter.Fps30)
-            : this(new Path2D[] { }, maxFps)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Animator2D"/> class.
-        /// </summary>
-        /// <param name="path">
-        /// The path.
-        /// </param>
-        /// <param name="maxFps">
-        /// The max fps.
-        /// </param>
-        // ReSharper disable once UnusedMember.Global
-        public Animator2D(Path2D path, Timer.FpsLimiter maxFps = Timer.FpsLimiter.Fps30)
-            : this(new[] { path }, maxFps)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Animator2D"/> class.
-        /// </summary>
-        /// <param name="paths">
-        /// The paths.
-        /// </param>
-        /// <param name="maxFps">
-        /// The max fps.
-        /// </param>
-        public Animator2D(Path2D[] paths, Timer.FpsLimiter maxFps = Timer.FpsLimiter.Fps30)
-        {
-            this.HorizontalAnimator = new Animator(maxFps);
-            this.VerticalAnimator = new Animator(maxFps);
-            this.SetPaths(paths);
-        }
-
-        #endregion
-
-        #region Enums
-
-        /// <summary>
-        /// The known properties to set
+        ///     The known two dimensional properties of WinForm controls
         /// </summary>
         public enum KnownProperties
         {
             /// <summary>
-            /// The size.
+            ///     The property named 'Size' of the object
             /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Size, 
+            Size,
 
             /// <summary>
-            /// The location.
+            ///     The property named 'Location' of the object
             /// </summary>
-            Location, 
+            Location
         }
 
-        #endregion
+        private readonly List<Path2D> _paths = new List<Path2D>();
 
-        #region Public Properties
 
         /// <summary>
-        /// Gets the active path.
+        ///     The callback to get invoked at the end of the animation
         /// </summary>
-        // ReSharper disable once UnusedMember.Global
-        public Path2D ActivePath
+        protected SafeInvoker EndCallback;
+
+        /// <summary>
+        ///     The callback to get invoked at each frame
+        /// </summary>
+        protected SafeInvoker<Float2D> FrameCallback;
+
+        /// <summary>
+        ///     A boolean value indicating if the EndInvoker already invoked
+        /// </summary>
+        protected bool IsEnded;
+
+        /// <summary>
+        ///     The target object to change the property of
+        /// </summary>
+        protected object TargetObject;
+
+        /// <summary>
+        ///     The latest horizontal value
+        /// </summary>
+        protected float? XValue;
+
+        /// <summary>
+        ///     The latest vertical value
+        /// </summary>
+        protected float? YValue;
+
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator2D" /> class.
+        /// </summary>
+        public Animator2D()
+            : this(new Path2D[] {})
         {
-            get
-            {
-                return new Path2D(this.HorizontalAnimator.ActivePath, this.VerticalAnimator.ActivePath);
-            }
         }
 
         /// <summary>
-        /// Gets the horizontal animator.
+        ///     Initializes a new instance of the <see cref="Animator2D" /> class.
         /// </summary>
-        public Animator HorizontalAnimator { get; private set; }
+        /// <param name="fpsLimiter">
+        ///     Limits the maximum frames per seconds
+        /// </param>
+        public Animator2D(FPSLimiterKnownValues fpsLimiter)
+            : this(new Path2D[] {}, fpsLimiter)
+        {
+        }
 
         /// <summary>
-        /// Gets or sets a value indicating whether repeat the animation
+        ///     Initializes a new instance of the <see cref="Animator2D" /> class.
         /// </summary>
-        // ReSharper disable once UnusedMember.Global
-        public bool Repeat
+        /// <param name="path">
+        ///     The path of the animation
+        /// </param>
+        public Animator2D(Path2D path)
+            : this(new[] {path})
         {
-            get
-            {
-                return this.HorizontalAnimator.Repeat && this.VerticalAnimator.Repeat;
-            }
+        }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator2D" /> class.
+        /// </summary>
+        /// <param name="path">
+        ///     The path of the animation
+        /// </param>
+        /// <param name="fpsLimiter">
+        ///     Limits the maximum frames per seconds
+        /// </param>
+        public Animator2D(Path2D path, FPSLimiterKnownValues fpsLimiter)
+            : this(new[] {path}, fpsLimiter)
+        {
+        }
+
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator2D" /> class.
+        /// </summary>
+        /// <param name="paths">
+        ///     An array containing the list of paths of the animation
+        /// </param>
+        public Animator2D(Path2D[] paths) : this(paths, FPSLimiterKnownValues.LimitThirty)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator2D" /> class.
+        /// </summary>
+        /// <param name="paths">
+        ///     An array containing the list of paths of the animation
+        /// </param>
+        /// <param name="fpsLimiter">
+        ///     Limits the maximum frames per seconds
+        /// </param>
+        public Animator2D(Path2D[] paths, FPSLimiterKnownValues fpsLimiter)
+        {
+            HorizontalAnimator = new Animator(fpsLimiter);
+            VerticalAnimator = new Animator(fpsLimiter);
+            Paths = paths;
+        }
+
+        /// <summary>
+        ///     Gets the currently active path.
+        /// </summary>
+        public Path2D ActivePath => new Path2D(HorizontalAnimator.ActivePath, VerticalAnimator.ActivePath);
+
+        /// <summary>
+        ///     Gets the horizontal animator.
+        /// </summary>
+        public Animator HorizontalAnimator { get; protected set; }
+
+        /// <summary>
+        ///     Gets the vertical animator.
+        /// </summary>
+        public Animator VerticalAnimator { get; protected set; }
+
+        /// <summary>
+        ///     Gets or sets an array containing the list of paths of the animation
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Animation is running</exception>
+        public Path2D[] Paths
+        {
+            get { return _paths.ToArray(); }
             set
             {
-                this.HorizontalAnimator.Repeat = this.VerticalAnimator.Repeat = value;
+                if (CurrentStatus == AnimatorStatus.Stopped)
+                {
+                    _paths.Clear();
+                    _paths.AddRange(value);
+                    var pathsH = new List<Path>();
+                    var pathsV = new List<Path>();
+                    foreach (var p in value)
+                    {
+                        pathsH.Add(p.HorizontalPath);
+                        pathsV.Add(p.VerticalPath);
+                    }
+                    HorizontalAnimator.Paths = pathsH.ToArray();
+                    VerticalAnimator.Paths = pathsV.ToArray();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Animation is running.");
+                }
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether reverse repeating the animation
+        ///     Gets or sets a value indicating whether animator should repeat the animation after its ending
         /// </summary>
-        // ReSharper disable once UnusedMember.Global
-        public bool ReverseRepeat
+        public virtual bool Repeat
+        {
+            get { return HorizontalAnimator.Repeat && VerticalAnimator.Repeat; }
+
+            set { HorizontalAnimator.Repeat = VerticalAnimator.Repeat = value; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether animator should repeat the animation in reverse after its ending.
+        /// </summary>
+        public virtual bool ReverseRepeat
+        {
+            get { return HorizontalAnimator.ReverseRepeat && VerticalAnimator.ReverseRepeat; }
+
+            set { HorizontalAnimator.ReverseRepeat = VerticalAnimator.ReverseRepeat = value; }
+        }
+
+        /// <summary>
+        ///     Gets the current status of the animation
+        /// </summary>
+        public virtual AnimatorStatus CurrentStatus
         {
             get
             {
-                return this.HorizontalAnimator.ReverseRepeat && this.VerticalAnimator.ReverseRepeat;
-            }
-
-            set
-            {
-                this.HorizontalAnimator.ReverseRepeat = this.VerticalAnimator.ReverseRepeat = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the status.
-        /// </summary>
-        public Animator.Status CurrentStatus
-        {
-            get
-            {
-                if (this.HorizontalAnimator.CurrentStatus == Animator.Status.Stopped
-                    && this.VerticalAnimator.CurrentStatus == Animator.Status.Stopped)
+                if (HorizontalAnimator.CurrentStatus == AnimatorStatus.Stopped
+                    && VerticalAnimator.CurrentStatus == AnimatorStatus.Stopped)
                 {
-                    return Animator.Status.Stopped;
+                    return AnimatorStatus.Stopped;
                 }
 
-                if (this.HorizontalAnimator.CurrentStatus == Animator.Status.Paused
-                    && this.VerticalAnimator.CurrentStatus == Animator.Status.Paused)
+                if (HorizontalAnimator.CurrentStatus == AnimatorStatus.Paused
+                    && VerticalAnimator.CurrentStatus == AnimatorStatus.Paused)
                 {
-                    return Animator.Status.Paused;
+                    return AnimatorStatus.Paused;
                 }
 
-                if (this.HorizontalAnimator.CurrentStatus == Animator.Status.OnHold
-                    && this.VerticalAnimator.CurrentStatus == Animator.Status.OnHold)
+                if (HorizontalAnimator.CurrentStatus == AnimatorStatus.OnHold
+                    && VerticalAnimator.CurrentStatus == AnimatorStatus.OnHold)
                 {
-                    return Animator.Status.OnHold;
+                    return AnimatorStatus.OnHold;
                 }
 
-                return Animator.Status.Playing;
+                return AnimatorStatus.Playing;
             }
         }
 
         /// <summary>
-        /// Gets the vertical animator.
+        ///     Pause the animation
         /// </summary>
-        public Animator VerticalAnimator { get; private set; }
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// The pause method
-        /// </summary>
-        public void Pause()
+        public virtual void Pause()
         {
-            if (this.CurrentStatus == Animator.Status.OnHold || this.CurrentStatus == Animator.Status.Playing)
+            if (CurrentStatus == AnimatorStatus.OnHold || CurrentStatus == AnimatorStatus.Playing)
             {
-                this.HorizontalAnimator.Pause();
-                this.VerticalAnimator.Pause();
+                HorizontalAnimator.Pause();
+                VerticalAnimator.Pause();
             }
         }
 
         /// <summary>
-        /// The play method
+        ///     Starts the playing of the animation
         /// </summary>
-        /// <param name="o">
-        /// The object
-        /// </param>
-        /// <param name="property">
-        /// The property of object
-        /// </param>
-        /// <param name="endCallback">
-        /// The end callback
-        /// </param>
-        /// <typeparam name="T">
-        /// Any object
-        /// </typeparam>
-        public void Play<T>(T o, KnownProperties property, SafeInvoker endCallback = null)
-        {
-            this.Play(o, property.ToString(), endCallback);
-        }
-
-        /// <summary>
-        /// The play method
-        /// </summary>
-        /// <param name="o">
-        /// The object
+        /// <param name="targetObject">
+        ///     The target object to change the property
         /// </param>
         /// <param name="propertyName">
-        /// The property name
+        ///     The name of the property to change
+        /// </param>
+        public virtual void Play(object targetObject, string propertyName)
+        {
+            Play(targetObject, propertyName, null);
+        }
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="propertyName">
+        ///     The name of the property to change
         /// </param>
         /// <param name="endCallback">
-        /// The end callback
+        ///     The callback to get invoked at the end of the animation
         /// </param>
-        /// <typeparam name="T">
-        /// Any object
-        /// </typeparam>
-        public void Play<T>(T o, string propertyName, SafeInvoker endCallback = null)
+        public virtual void Play(object targetObject, string propertyName, SafeInvoker endCallback)
         {
-            this.underlyingObject = o;
-            PropertyInfo prop = this.underlyingObject.GetType()
+            TargetObject = targetObject;
+            var prop = TargetObject.GetType()
                 .GetProperty(
                     propertyName,
-                    BindingFlags.IgnoreCase | BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
+                    BindingFlags.IgnoreCase | BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance |
+                    BindingFlags.SetProperty);
             if (prop == null) return;
 
-            this.Play(
-                new SafeInvoker(
-                    (float2D value) => prop.SetValue(this.underlyingObject, Convert.ChangeType(value, prop.PropertyType), null), 
-                    this.underlyingObject), 
+            Play(
+                new SafeInvoker<Float2D>(
+                    value =>
+                        prop.SetValue(TargetObject, Convert.ChangeType(value, prop.PropertyType), null),
+                    TargetObject),
                 endCallback);
         }
 
         /// <summary>
-        /// The play method
+        ///     Starts the playing of the animation
         /// </summary>
-        /// <param name="o">
-        /// The object.
+        /// <param name="targetObject">
+        ///     The target object to change the property
         /// </param>
         /// <param name="propertySetter">
-        /// The property setter expression
-        /// </param>
-        /// <param name="endCallback">
-        /// The end callback
+        ///     The expression that represents the property of the target object
         /// </param>
         /// <typeparam name="T">
-        /// Any object
+        ///     Any object containing a property
         /// </typeparam>
-        // ReSharper disable once UnusedMember.Global
-        public void Play<T>(T o, Expression<Func<T, object>> propertySetter, SafeInvoker endCallback = null)
+        public virtual void Play<T>(T targetObject, Expression<Func<T, object>> propertySetter)
+        {
+            Play(targetObject, propertySetter, null);
+        }
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="propertySetter">
+        ///     The expression that represents the property of the target object
+        /// </param>
+        /// <param name="endCallback">
+        ///     The callback to get invoked at the end of the animation
+        /// </param>
+        /// <typeparam name="T">
+        ///     Any object containing a property
+        /// </typeparam>
+        public virtual void Play<T>(T targetObject, Expression<Func<T, object>> propertySetter, SafeInvoker endCallback)
         {
             if (propertySetter == null)
                 return;
-            this.underlyingObject = o;
-            MemberExpression expr;
-            if (propertySetter.Body is MemberExpression)
+            TargetObject = targetObject;
+
+            var property =
+                ((propertySetter.Body as MemberExpression) ??
+                 (((UnaryExpression) propertySetter.Body).Operand as MemberExpression))?.Member as PropertyInfo;
+            if (property == null)
             {
-                expr = (MemberExpression)propertySetter.Body;
-            }
-            else
-            {
-                expr = (MemberExpression)((UnaryExpression)propertySetter.Body).Operand;
+                throw new ArgumentException(nameof(propertySetter));
             }
 
-            PropertyInfo prop = (PropertyInfo)expr.Member;
-            this.Play(
-                new SafeInvoker(
-                    (float2D value) => prop.SetValue(this.underlyingObject, Convert.ChangeType(value, prop.PropertyType), null), 
-                    this.underlyingObject), 
+            Play(
+                new SafeInvoker<Float2D>(
+                    value =>
+                        property.SetValue(TargetObject, Convert.ChangeType(value, property.PropertyType), null),
+                    TargetObject),
                 endCallback);
         }
 
         /// <summary>
-        /// The play method
+        ///     Resume the animation from where it paused
         /// </summary>
-        /// <param name="frameCallback">
-        /// The frame callback.
+        public virtual void Resume()
+        {
+            if (CurrentStatus == AnimatorStatus.Paused)
+            {
+                HorizontalAnimator.Resume();
+                VerticalAnimator.Resume();
+            }
+        }
+
+        /// <summary>
+        ///     Stops the animation and resets its status, resume is no longer possible
+        /// </summary>
+        public virtual void Stop()
+        {
+            HorizontalAnimator.Stop();
+            VerticalAnimator.Stop();
+            XValue = YValue = null;
+        }
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="property">
+        ///     The property to change
+        /// </param>
+        public void Play(object targetObject, KnownProperties property)
+        {
+            Play(targetObject, property, null);
+        }
+
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="property">
+        ///     The property to change
         /// </param>
         /// <param name="endCallback">
-        /// The end callback.
+        ///     The callback to get invoked at the end of the animation
         /// </param>
-        public void Play(SafeInvoker frameCallback, SafeInvoker endCallback = null)
+        public void Play(object targetObject, KnownProperties property, SafeInvoker endCallback)
         {
-            this.Stop();
-            this.frameInvoker = frameCallback;
-            this.endInvoker = endCallback;
-            this.HorizontalAnimator.Play(
-                new SafeInvoker(
-                    value =>
-                        {
-                            this.x = value;
-                            this.InvokeSetter();
-                        }), 
-                new SafeInvoker(this.InvokeFinisher));
-            this.VerticalAnimator.Play(
-                new SafeInvoker(
-                    value =>
-                        {
-                            this.y = value;
-                            this.InvokeSetter();
-                        }), 
-                new SafeInvoker(this.InvokeFinisher));
+            Play(targetObject, property.ToString(), endCallback);
         }
 
         /// <summary>
-        /// The resume method
+        ///     Starts the playing of the animation
         /// </summary>
-        public void Resume()
-        {
-            if (this.CurrentStatus == Animator.Status.Paused)
-            {
-                this.HorizontalAnimator.Resume();
-                this.VerticalAnimator.Resume();
-            }
-        }
-
-        /// <summary>
-        /// The set new paths.
-        /// </summary>
-        /// <param name="newPaths">
-        /// The new paths.
+        /// <param name="frameCallback">
+        ///     The callback to get invoked at each frame
         /// </param>
-        /// <exception cref="NotSupportedException">
-        /// Animation is running
-        /// </exception>
-        public void SetPaths(params Path2D[] newPaths)
+        public void Play(SafeInvoker<Float2D> frameCallback)
         {
-            if (this.CurrentStatus == Animator.Status.Stopped)
-            {
-                this.paths.Clear();
-                this.paths.AddRange(newPaths);
-                List<Path> pathsH = new List<Path>();
-                List<Path> pathsV = new List<Path>();
-                foreach (Path2D p in newPaths)
-                {
-                    pathsH.Add(p.HorizontalPath);
-                    pathsV.Add(p.VerticalPath);
-                }
-
-                this.HorizontalAnimator.SetPaths(pathsH.ToArray());
-                this.VerticalAnimator.SetPaths(pathsV.ToArray());
-            }
-            else
-            {
-                throw new NotSupportedException("Animation is running.");
-            }
+            Play(frameCallback, (SafeInvoker) null);
         }
 
         /// <summary>
-        /// The stop method
+        ///     Starts the playing of the animation
         /// </summary>
-        public void Stop()
+        /// <param name="frameCallback">
+        ///     The callback to get invoked at each frame
+        /// </param>
+        /// <param name="endCallback">
+        ///     The callback to get invoked at the end of the animation
+        /// </param>
+        public void Play(SafeInvoker<Float2D> frameCallback, SafeInvoker endCallback)
         {
-            this.HorizontalAnimator.Stop();
-            this.VerticalAnimator.Stop();
-            this.x = this.y = null;
+            Stop();
+            FrameCallback = frameCallback;
+            EndCallback = endCallback;
+            HorizontalAnimator.Play(
+                new SafeInvoker<float>(
+                    value =>
+                    {
+                        XValue = value;
+                        InvokeSetter();
+                    }),
+                new SafeInvoker(InvokeFinisher));
+            VerticalAnimator.Play(
+                new SafeInvoker<float>(
+                    value =>
+                    {
+                        YValue = value;
+                        InvokeSetter();
+                    }),
+                new SafeInvoker(InvokeFinisher));
         }
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// The invoke finish callback
-        /// </summary>
         private void InvokeFinisher()
         {
-            if (this.endInvoker != null && !this.ended)
+            if (EndCallback != null && !IsEnded)
             {
-                lock (this.endInvoker)
-                    if (this.CurrentStatus == Animator.Status.Stopped && (this.ended = true))
+                lock (EndCallback)
+                {
+                    if (CurrentStatus == AnimatorStatus.Stopped)
                     {
-                        this.endInvoker.Invoke();
+                        IsEnded = true;
+                        EndCallback.Invoke();
                     }
+                }
             }
         }
 
-        /// <summary>
-        /// The invoke frame callback
-        /// </summary>
         private void InvokeSetter()
         {
-            if (this.x != null && this.y != null)
+            if (XValue != null && YValue != null)
             {
-                this.frameInvoker.Invoke(new float2D(this.x.Value, this.y.Value));
+                FrameCallback.Invoke(new Float2D(XValue.Value, YValue.Value));
             }
         }
-
-        #endregion
     }
 }

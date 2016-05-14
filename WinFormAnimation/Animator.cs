@@ -1,477 +1,463 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Animator.cs" company="Soroush Falahati (soroush@falahati.net)">
-//   This library is free software; you can redistribute it and/or
-//   modify it under the terms of the GNU Lesser General Public
-//   License as published by the Free Software Foundation; either
-//   version 2.1 of the License, or (at your option) any later version.
-//   
-//   This library is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//   Lesser General Public License for more details.
-// </copyright>
-// <summary>
-//   The animator class
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace WinFormAnimation
 {
-    #region
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    #endregion
-
     /// <summary>
-    /// The animator class
+    ///     The one dimensional animator class, useful for animating raw values
     /// </summary>
-    public class Animator
+    public class Animator : IAnimator
     {
-        #region Fields
-
         /// <summary>
-        /// The key frames / paths
-        /// </summary>
-        private readonly List<Path> paths = new List<Path>();
-
-        /// <summary>
-        /// The temporary variable for key frames / paths
-        /// </summary>
-        private readonly List<Path> tempPaths = new List<Path>();
-
-        /// <summary>
-        /// The timer object.
-        /// </summary>
-        private readonly Timer timer;
-
-        /// <summary>
-        /// The ending invoker.
-        /// </summary>
-        private SafeInvoker endInvoker;
-
-        /// <summary>
-        /// The frame tick invoker.
-        /// </summary>
-        private SafeInvoker frameInvoker;
-
-        /// <summary>
-        /// The are we in hold?.
-        /// </summary>
-        private bool holdEnded;
-
-        /// <summary>
-        /// The underlying object for setting property.
-        /// </summary>
-        private object underlyingObject;
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Animator"/> class.
-        /// </summary>
-        /// <param name="maxFps">
-        /// The max fps.
-        /// </param>
-        public Animator(Timer.FpsLimiter maxFps = Timer.FpsLimiter.Fps30)
-            : this(new Path[] { }, maxFps)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Animator"/> class.
-        /// </summary>
-        /// <param name="path">
-        /// The path.
-        /// </param>
-        /// <param name="maxFps">
-        /// The max fps.
-        /// </param>
-        // ReSharper disable once UnusedMember.Global
-        public Animator(Path path, Timer.FpsLimiter maxFps = Timer.FpsLimiter.Fps30)
-            : this(new[] { path }, maxFps)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Animator"/> class.
-        /// </summary>
-        /// <param name="paths">
-        /// The paths.
-        /// </param>
-        /// <param name="maxFps">
-        /// The max fps.
-        /// </param>
-        public Animator(Path[] paths, Timer.FpsLimiter maxFps = Timer.FpsLimiter.Fps30)
-        {
-            this.CurrentStatus = Status.Stopped;
-            this.SetPaths(paths);
-            this.timer = new Timer(this.Elapsed, maxFps);
-        }
-
-        #endregion
-
-        #region Enums
-
-        /// <summary>
-        /// The known properties to set
+        ///     The known one dimensional properties of WinForm controls
         /// </summary>
         public enum KnownProperties
         {
             /// <summary>
-            /// The value.
+            ///     The property named 'Value' of the object
             /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Value, 
+            Value,
 
             /// <summary>
-            /// The text.
+            ///     The property named 'Text' of the object
             /// </summary>
-            Text, 
+            Text,
 
             /// <summary>
-            /// The caption.
+            ///     The property named 'Caption' of the object
             /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Caption, 
+            Caption,
 
             /// <summary>
-            /// The back color.
+            ///     The property named 'BackColor' of the object
             /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            BackColor, 
+            BackColor,
 
             /// <summary>
-            /// The fore color.
+            ///     The property named 'ForeColor' of the object
             /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            ForeColor, 
+            ForeColor,
 
             /// <summary>
-            /// The opacity.
+            ///     The property named 'Opacity' of the object
             /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Opacity, 
+            Opacity
         }
 
+        private readonly List<Path> _paths = new List<Path>();
+
+        private readonly List<Path> _tempPaths = new List<Path>();
+
+        private readonly Timer _timer;
+
+        private bool _holdEnded;
+
         /// <summary>
-        /// The possible statuses
+        ///     The callback to get invoked at the end of the animation
         /// </summary>
-        public enum Status
-        {
-            /// <summary>
-            /// The stopped.
-            /// </summary>
-            Stopped, 
-
-            /// <summary>
-            /// The playing.
-            /// </summary>
-            Playing, 
-
-            /// <summary>
-            /// The on hold.
-            /// </summary>
-            OnHold, 
-
-            /// <summary>
-            /// The paused.
-            /// </summary>
-            Paused, 
-        }
-
-        #endregion
-
-        #region Public Properties
+        protected SafeInvoker EndCallback;
 
         /// <summary>
-        /// Gets the active path.
+        ///     The callback to get invoked at each frame
+        /// </summary>
+        protected SafeInvoker<float> FrameCallback;
+
+        /// <summary>
+        ///     The target object to change the property of
+        /// </summary>
+        protected object TargetObject;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator" /> class.
+        /// </summary>
+        public Animator()
+            : this(new Path[] {})
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator" /> class.
+        /// </summary>
+        /// <param name="fpsLimiter">
+        ///     Limits the maximum frames per seconds
+        /// </param>
+        public Animator(FPSLimiterKnownValues fpsLimiter)
+            : this(new Path[] {}, fpsLimiter)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator" /> class.
+        /// </summary>
+        /// <param name="path">
+        ///     The path of the animation
+        /// </param>
+        public Animator(Path path)
+            : this(new[] {path})
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator" /> class.
+        /// </summary>
+        /// <param name="path">
+        ///     The path of the animation
+        /// </param>
+        /// <param name="fpsLimiter">
+        ///     Limits the maximum frames per seconds
+        /// </param>
+        public Animator(Path path, FPSLimiterKnownValues fpsLimiter)
+            : this(new[] {path}, fpsLimiter)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator" /> class.
+        /// </summary>
+        /// <param name="paths">
+        ///     An array containing the list of paths of the animation
+        /// </param>
+        public Animator(Path[] paths) : this(paths, FPSLimiterKnownValues.LimitThirty)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Animator" /> class.
+        /// </summary>
+        /// <param name="paths">
+        ///     An array containing the list of paths of the animation
+        /// </param>
+        /// <param name="fpsLimiter">
+        ///     Limits the maximum frames per seconds
+        /// </param>
+        public Animator(Path[] paths, FPSLimiterKnownValues fpsLimiter)
+        {
+            CurrentStatus = AnimatorStatus.Stopped;
+            _timer = new Timer(Elapsed, fpsLimiter);
+            Paths = paths;
+        }
+
+        /// <summary>
+        ///     Gets or sets an array containing the list of paths of the animation
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Animation is running</exception>
+        public Path[] Paths
+        {
+            get { return _paths.ToArray(); }
+            set
+            {
+                if (CurrentStatus == AnimatorStatus.Stopped)
+                {
+                    _paths.Clear();
+                    _paths.AddRange(value);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Animation is running.");
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Gets the currently active path.
         /// </summary>
         public Path ActivePath { get; private set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether repeat the animation
+        ///     Gets or sets a value indicating whether animator should repeat the animation after its ending
         /// </summary>
-        public bool Repeat { get; set; }
+        public virtual bool Repeat { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether reverse repeating the animation
+        ///     Gets or sets a value indicating whether animator should repeat the animation in reverse after its ending.
         /// </summary>
-        public bool ReverseRepeat { get; set; }
+        public virtual bool ReverseRepeat { get; set; }
 
         /// <summary>
-        /// Gets the status.
+        ///     Gets the current status of the animation
         /// </summary>
-        public Status CurrentStatus { get; private set; }
-
-        #endregion
-
-        #region Public Methods and Operators
+        public virtual AnimatorStatus CurrentStatus { get; private set; }
 
         /// <summary>
-        /// The pause method
+        ///     Pause the animation
         /// </summary>
-        public void Pause()
+        public virtual void Pause()
         {
-            if (this.CurrentStatus != Status.OnHold && this.CurrentStatus != Status.Playing)
+            if (CurrentStatus != AnimatorStatus.OnHold && CurrentStatus != AnimatorStatus.Playing)
                 return;
-            this.timer.Stop();
-            this.CurrentStatus = Status.Paused;
+            _timer.Stop();
+            CurrentStatus = AnimatorStatus.Paused;
         }
 
         /// <summary>
-        /// The play method
+        ///     Starts the playing of the animation
         /// </summary>
-        /// <param name="o">
-        /// The object
-        /// </param>
-        /// <param name="property">
-        /// The property of object
-        /// </param>
-        /// <param name="endCallback">
-        /// The end callback
-        /// </param>
-        /// <typeparam name="T">
-        /// Any object
-        /// </typeparam>
-        public void Play<T>(T o, KnownProperties property, SafeInvoker endCallback = null)
-        {
-            this.Play(o, property.ToString(), endCallback);
-        }
-
-        /// <summary>
-        /// The play method
-        /// </summary>
-        /// <param name="o">
-        /// The object
+        /// <param name="targetObject">
+        ///     The target object to change the property
         /// </param>
         /// <param name="propertyName">
-        /// The property name
+        ///     The name of the property to change
+        /// </param>
+        public virtual void Play(object targetObject, string propertyName)
+        {
+            Play(targetObject, propertyName, null);
+        }
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="propertyName">
+        ///     The name of the property to change
         /// </param>
         /// <param name="endCallback">
-        /// The end callback
+        ///     The callback to get invoked at the end of the animation
         /// </param>
-        /// <typeparam name="T">
-        /// Any object
-        /// </typeparam>
-        public void Play<T>(T o, string propertyName, SafeInvoker endCallback = null)
+        public virtual void Play(object targetObject, string propertyName, SafeInvoker endCallback)
         {
-            this.underlyingObject = o;
-            PropertyInfo prop = this.underlyingObject.GetType()
+            TargetObject = targetObject;
+            var prop = TargetObject.GetType()
                 .GetProperty(
                     propertyName,
-                    BindingFlags.IgnoreCase | BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
+                    BindingFlags.IgnoreCase | BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance |
+                    BindingFlags.SetProperty);
             if (prop == null) return;
-            
-            this.Play(
-                new SafeInvoker(
-                    (float value) => prop.SetValue(this.underlyingObject, Convert.ChangeType(value, prop.PropertyType), null), 
-                    this.underlyingObject), 
+            Play(
+                new SafeInvoker<float>(
+                    value => prop.SetValue(TargetObject, Convert.ChangeType(value, prop.PropertyType), null),
+                    TargetObject),
                 endCallback);
         }
 
         /// <summary>
-        /// The play method
+        ///     Starts the playing of the animation
         /// </summary>
-        /// <param name="o">
-        /// The object.
+        /// <param name="targetObject">
+        ///     The target object to change the property
         /// </param>
         /// <param name="propertySetter">
-        /// The property setter expression
-        /// </param>
-        /// <param name="endCallback">
-        /// The end callback
+        ///     The expression that represents the property of the target object
         /// </param>
         /// <typeparam name="T">
-        /// Any object
+        ///     Any object containing a property
         /// </typeparam>
-        // ReSharper disable once UnusedMember.Global
-        public void Play<T>(T o, Expression<Func<T, object>> propertySetter, SafeInvoker endCallback = null)
+        public virtual void Play<T>(T targetObject, Expression<Func<T, object>> propertySetter)
+        {
+            Play(targetObject, propertySetter, null);
+        }
+
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="propertySetter">
+        ///     The expression that represents the property of the target object
+        /// </param>
+        /// <param name="endCallback">
+        ///     The callback to get invoked at the end of the animation
+        /// </param>
+        /// <typeparam name="T">
+        ///     Any object containing a property
+        /// </typeparam>
+        public virtual void Play<T>(T targetObject, Expression<Func<T, object>> propertySetter, SafeInvoker endCallback)
         {
             if (propertySetter == null)
                 return;
-            this.underlyingObject = o;
-            MemberExpression expr;
-            if (propertySetter.Body is MemberExpression)
+            TargetObject = targetObject;
+
+            var property =
+                ((propertySetter.Body as MemberExpression) ??
+                 (((UnaryExpression) propertySetter.Body).Operand as MemberExpression))?.Member as PropertyInfo;
+            if (property == null)
             {
-                expr = (MemberExpression)propertySetter.Body;
-            }
-            else
-            {
-                expr = (MemberExpression)((UnaryExpression)propertySetter.Body).Operand;
+                throw new ArgumentException(nameof(propertySetter));
             }
 
-            PropertyInfo prop = (PropertyInfo)expr.Member;
-            this.Play(
-                new SafeInvoker(
-                    (float value) => prop.SetValue(this.underlyingObject, Convert.ChangeType(value, prop.PropertyType), null), 
-                    this.underlyingObject), 
+            Play(
+                new SafeInvoker<float>(
+                    value => property.SetValue(TargetObject, Convert.ChangeType(value, property.PropertyType), null),
+                    TargetObject),
                 endCallback);
         }
 
         /// <summary>
-        /// The play method
+        ///     Resume the animation from where it paused
         /// </summary>
-        /// <param name="frameCallback">
-        /// The frame callback.
+        public virtual void Resume()
+        {
+            if (CurrentStatus == AnimatorStatus.Paused)
+            {
+                _timer.Resume();
+            }
+        }
+
+        /// <summary>
+        ///     Stops the animation and resets its status, resume is no longer possible
+        /// </summary>
+        public virtual void Stop()
+        {
+            _timer.Stop();
+            lock (_tempPaths)
+            {
+                _tempPaths.Clear();
+            }
+            ActivePath = null;
+            CurrentStatus = AnimatorStatus.Stopped;
+        }
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="property">
+        ///     The property to change
+        /// </param>
+        public virtual void Play(object targetObject, KnownProperties property)
+        {
+            Play(targetObject, property, null);
+        }
+
+
+        /// <summary>
+        ///     Starts the playing of the animation
+        /// </summary>
+        /// <param name="targetObject">
+        ///     The target object to change the property
+        /// </param>
+        /// <param name="property">
+        ///     The property to change
         /// </param>
         /// <param name="endCallback">
-        /// The end callback.
+        ///     The callback to get invoked at the end of the animation
         /// </param>
-        public void Play(SafeInvoker frameCallback, SafeInvoker endCallback = null)
+        public virtual void Play(object targetObject, KnownProperties property, SafeInvoker endCallback)
         {
-            this.Stop();
-            this.frameInvoker = frameCallback;
-            this.endInvoker = endCallback;
-            this.timer.ResetClock();
-            this.CurrentStatus = Status.Playing;
-            lock (this.tempPaths) this.tempPaths.AddRange(this.paths);
-            this.timer.Start();
+            Play(targetObject, property.ToString(), endCallback);
         }
 
         /// <summary>
-        /// The resume method
+        ///     Starts the playing of the animation
         /// </summary>
-        public void Resume()
-        {
-            if (this.CurrentStatus == Status.Paused)
-            {
-                this.timer.Resume();
-            }
-        }
-
-        /// <summary>
-        /// The set new paths.
-        /// </summary>
-        /// <param name="newPaths">
-        /// The new paths.
+        /// <param name="frameCallback">
+        ///     The callback to get invoked at each frame
         /// </param>
-        /// <exception cref="NotSupportedException">
-        /// Animation is running
-        /// </exception>
-        public void SetPaths(params Path[] newPaths)
+        public virtual void Play(SafeInvoker<float> frameCallback)
         {
-            if (this.CurrentStatus == Status.Stopped)
-            {
-                this.paths.Clear();
-                this.paths.AddRange(newPaths);
-            }
-            else
-            {
-                throw new NotSupportedException("Animation is running.");
-            }
+            Play(frameCallback, (SafeInvoker<float>) null);
         }
 
-        /// <summary>
-        /// The stop method
-        /// </summary>
-        public void Stop()
-        {
-            this.timer.Stop();
-            lock (this.tempPaths) this.tempPaths.Clear();
-            this.ActivePath = null;
-            this.CurrentStatus = Status.Stopped;
-        }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
-        /// The tick method.
+        ///     Starts the playing of the animation
         /// </summary>
-        /// <param name="millSinceBeginning">
-        /// The milliseconds since beginning.
+        /// <param name="frameCallback">
+        ///     The callback to get invoked at each frame
         /// </param>
-        private void Elapsed(int millSinceBeginning)
+        /// <param name="endCallback">
+        ///     The callback to get invoked at the end of the animation
+        /// </param>
+        public virtual void Play(SafeInvoker<float> frameCallback, SafeInvoker endCallback)
         {
-            lock (this.tempPaths)
+            Stop();
+            FrameCallback = frameCallback;
+            EndCallback = endCallback;
+            _timer.ResetClock();
+            CurrentStatus = AnimatorStatus.Playing;
+            lock (_tempPaths)
             {
-                if (this.tempPaths != null && this.ActivePath == null && this.tempPaths.Count > 0)
+                _tempPaths.AddRange(_paths);
+            }
+            _timer.Start();
+        }
+
+        private void Elapsed(ulong millSinceBeginning)
+        {
+            lock (_tempPaths)
+            {
+                if (_tempPaths != null && ActivePath == null && _tempPaths.Count > 0)
                 {
-                    while (this.ActivePath == null)
+                    while (ActivePath == null)
                     {
-                        this.ActivePath = this.tempPaths[0];
-                        this.tempPaths.RemoveAt(0);
+                        ActivePath = _tempPaths[0];
+                        _tempPaths.RemoveAt(0);
                     }
                 }
 
-                if (this.ActivePath != null)
+                if (ActivePath != null)
                 {
-                    if (!this.holdEnded)
+                    if (!_holdEnded)
                     {
-                        if (this.ActivePath.Delay > 0)
+                        if (ActivePath.Delay > 0)
                         {
-                            if (millSinceBeginning > this.ActivePath.Delay)
+                            if (millSinceBeginning > ActivePath.Delay)
                             {
-                                this.holdEnded = true;
-                                this.timer.ResetClock();
+                                _holdEnded = true;
+                                _timer.ResetClock();
                                 millSinceBeginning = 0;
                             }
                             else
                             {
-                                this.CurrentStatus = Status.OnHold;
+                                CurrentStatus = AnimatorStatus.OnHold;
                             }
                         }
                         else
                         {
-                            this.holdEnded = true;
+                            _holdEnded = true;
                         }
                     }
 
-                    if (this.holdEnded)
+                    if (_holdEnded)
                     {
-                        if (millSinceBeginning <= this.ActivePath.Duration)
+                        if (millSinceBeginning <= ActivePath.Duration)
                         {
-                            this.CurrentStatus = Status.Playing;
-                            float value = this.ActivePath.Function(
-                                millSinceBeginning, 
-                                this.ActivePath.Start, 
-                                this.ActivePath.Change, 
-                                this.ActivePath.Duration);
-                            this.frameInvoker.Invoke(value);
+                            CurrentStatus = AnimatorStatus.Playing;
+                            var value = ActivePath.Function(
+                                millSinceBeginning,
+                                ActivePath.Start,
+                                ActivePath.Change,
+                                ActivePath.Duration);
+                            FrameCallback.Invoke(value);
                         }
                         else
                         {
-                            this.holdEnded = false;
-                            this.timer.ResetClock();
-                            float end = this.ActivePath.End;
-                            this.ActivePath = null;
-                            this.frameInvoker.Invoke(end);
+                            _holdEnded = false;
+                            _timer.ResetClock();
+                            var end = ActivePath.End;
+                            ActivePath = null;
+                            FrameCallback.Invoke(end);
                         }
                     }
                 }
-                else if (this.Repeat)
+                else if (Repeat)
                 {
-                    lock (this.tempPaths)
+                    lock (_tempPaths)
                     {
-                        this.tempPaths.AddRange(this.paths);
-                        if (this.ReverseRepeat)
+                        _tempPaths.AddRange(_paths);
+                        if (ReverseRepeat)
                         {
-                            this.tempPaths.Reverse();
-                            for (int i = 0; i < this.tempPaths.Count; i++)
+                            _tempPaths.Reverse();
+                            for (var i = 0; i < _tempPaths.Count; i++)
                             {
-                                this.tempPaths[i] = this.tempPaths[i].Reverse();
+                                _tempPaths[i] = _tempPaths[i].Reverse();
                             }
                         }
                     }
                 }
                 else
                 {
-                    this.Stop();
-                    if (this.endInvoker != null)
-                    {
-                        this.endInvoker.Invoke();
-                    }
+                    Stop();
+                    EndCallback?.Invoke();
                 }
             }
         }
-
-        #endregion
     }
 }

@@ -1,124 +1,157 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Path.cs" company="Soroush Falahati (soroush@falahati.net)">
-//   This library is free software; you can redistribute it and/or
-//   modify it under the terms of the GNU Lesser General Public
-//   License as published by the Free Software Foundation; either
-//   version 2.1 of the License, or (at your option) any later version.
-//   
-//   This library is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//   Lesser General Public License for more details.
-// </copyright>
-// <summary>
-//   The 1D key frame/path class
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
 
 namespace WinFormAnimation
 {
-    #region
-
-    using System;
-
-    #endregion
-
     /// <summary>
-    /// The path.
+    ///     The Path class is a representation of a line in a 1D plane and the
+    ///     speed in which the animator plays it
     /// </summary>
     public class Path
     {
-        #region Constructors and Destructors
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path" /> class.
+        /// </summary>
+        public Path() : this(default(float), default(float), default(float), 0, null)
+        {
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Path"/> class.
+        ///     Initializes a new instance of the <see cref="Path" /> class.
         /// </summary>
         /// <param name="start">
-        /// The starting value.
+        ///     The starting value
         /// </param>
         /// <param name="end">
-        /// The ending value.
+        ///     The ending value
         /// </param>
         /// <param name="duration">
-        /// The duration of changes.
-        /// </param>
-        /// <param name="delay">
-        /// The delay of changes.
-        /// </param>
-        /// <param name="function">
-        /// The animation function.
+        ///     The time in miliseconds that the animator must play this path
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Duration is less than zero
+        ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, float duration, float delay = 0, Functions.Function function = null)
+        public Path(float start, float end, float duration) : this(start, end, duration, 0, null)
         {
-            this.Start = start;
-            this.End = end;
-            this.Change = this.End - this.Start;
-            if (this.Duration < 0)
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting value
+        /// </param>
+        /// <param name="end">
+        ///     The ending value
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="function">
+        ///     The animation function
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path(float start, float end, float duration, AnimationFunctions.Function function)
+            : this(start, end, duration, 0, function)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting value
+        /// </param>
+        /// <param name="end">
+        ///     The ending value
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="delay">
+        ///     The time in miliseconds that the animator must wait before playing this path
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path(float start, float end, float duration, float delay) : this(start, end, duration, delay, null)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting value
+        /// </param>
+        /// <param name="end">
+        ///     The ending value
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="delay">
+        ///     The time in miliseconds that the animator must wait before playing this path
+        /// </param>
+        /// <param name="function">
+        ///     The animation function
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path(float start, float end, float duration, float delay, AnimationFunctions.Function function)
+        {
+            if (Duration < 0)
             {
                 throw new ArgumentOutOfRangeException();
             }
-
-            this.Duration = duration;
-            this.Function = function;
-            this.Delay = delay;
-            if (this.Function == null)
-            {
-                this.Function = Functions.Liner;
-            }
+            Start = start;
+            End = end;
+            Function = function ?? AnimationFunctions.Liner;
+            Duration = duration;
+            Delay = delay;
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        /// Gets the start - end difference.
+        ///     Gets the difference of starting and ending values
         /// </summary>
-        public float Change { get; private set; }
+        public float Change => End - Start;
 
         /// <summary>
-        /// Gets the delay of changes.
+        ///     Gets or sets the starting delay
         /// </summary>
-        public float Delay { get; private set; }
+        public float Delay { get; set; }
 
         /// <summary>
-        /// Gets the duration of changes.
+        ///     Gets or sets the duration in milliseconds
         /// </summary>
-        public float Duration { get; private set; }
+        public float Duration { get; set; }
 
         /// <summary>
-        /// Gets the ending value.
+        ///     Gets or sets the ending value
         /// </summary>
-        public float End { get; private set; }
+        public float End { get; set; }
 
         /// <summary>
-        /// Gets the animation function.
+        ///     Gets or sets the animation function
         /// </summary>
-        public Functions.Function Function { get; private set; }
+        public AnimationFunctions.Function Function { get; set; }
 
         /// <summary>
-        /// Gets the starting value.
+        ///     Gets or sets the starting value
         /// </summary>
-        public float Start { get; private set; }
-
-        #endregion
-
-        #region Public Methods and Operators
+        public float Start { get; set; }
 
         /// <summary>
-        /// The reverse method.
+        ///     Creates and returns a new <see cref="Path" /> based on the current path but in reverse order
         /// </summary>
         /// <returns>
-        /// The <see cref="Path"/> which is the reverse of the current <see cref="Path"/>.
+        ///     A new <see cref="Path" /> which is the reverse of the current <see cref="Path" />
         /// </returns>
         public Path Reverse()
         {
-            return new Path(this.End, this.Start, this.Duration, this.Delay, this.Function);
+            return new Path(End, Start, Duration, Delay, Function);
         }
-
-        #endregion
     }
 }

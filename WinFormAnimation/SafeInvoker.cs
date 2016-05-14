@@ -1,267 +1,128 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SafeInvoker.cs" company="Soroush Falahati (soroush@falahati.net)">
-//   This library is free software; you can redistribute it and/or
-//   modify it under the terms of the GNU Lesser General Public
-//   License as published by the Free Software Foundation; either
-//   version 2.1 of the License, or (at your option) any later version.
-//   
-//   This library is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//   Lesser General Public License for more details.
-// </copyright>
-// <summary>
-//   The safe invoker class for passing delegates and execute them in correct thread.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
+using System.Reflection;
+using System.Threading;
 
 namespace WinFormAnimation
 {
-    #region
-
-    using System;
-    using System.Reflection;
-    using System.Threading;
-
-    #endregion
-
     /// <summary>
-    /// The safe invoker class for passing delegates and execute them in correct thread.
+    ///     The safe invoker class is a delegate reference holder that always
+    ///     execute them in the correct thread based on the passed control.
     /// </summary>
     public class SafeInvoker
     {
-        #region Fields
+        private MethodInfo _invokeMethod;
+
+        private PropertyInfo _invokeRequiredProperty;
+        private object _targetControl;
 
         /// <summary>
-        /// The underlying delegate.
+        ///     Initializes a new instance of the SafeInvoker class.
         /// </summary>
-        private readonly Delegate underlyingDelegate;
-
-        /// <summary>
-        /// The invoke method info
-        /// </summary>
-        private MethodInfo invokeMethod;
-
-        /// <summary>
-        /// The invoke required property info
-        /// </summary>
-        private PropertyInfo invokeRequiredProperty;
-
-        /// <summary>
-        /// The reference object.
-        /// </summary>
-        private object refObject;
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SafeInvoker"/> class.
-        /// </summary>
-        /// <param name="del">
-        /// The void delegate.
+        /// <param name="action">
+        ///     The callback to be invoked
         /// </param>
-        /// <param name="o">
-        /// The responsible object.
+        /// <param name="targetControl">
+        ///     The control to be used to invoke the callback in UI thread
         /// </param>
-        public SafeInvoker(Callback del, object o = null)
+        public SafeInvoker(Action action, object targetControl) : this((Delegate) action, targetControl)
         {
-            this.underlyingDelegate = del;
-            if (o != null)
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the SafeInvoker class.
+        /// </summary>
+        /// <param name="action">
+        ///     The callback to be invoked
+        /// </param>
+        /// <param name="targetControl">
+        ///     The control to be used to invoke the callback in UI thread
+        /// </param>
+        protected SafeInvoker(Delegate action, object targetControl)
+        {
+            UnderlyingDelegate = action;
+            if (targetControl != null)
             {
-                this.SetObject(o);
+                TargetControl = targetControl;
             }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SafeInvoker"/> class.
+        ///     Initializes a new instance of the SafeInvoker class.
         /// </summary>
-        /// <param name="del">
-        /// The float setter delegate.
+        /// <param name="action">
+        ///     The callback to be invoked
         /// </param>
-        /// <param name="o">
-        /// The responsible object.
-        /// </param>
-        public SafeInvoker(Setter del, object o = null)
+        public SafeInvoker(Action action) : this(action, null)
         {
-            this.underlyingDelegate = del;
-            if (o != null)
+        }
+
+        /// <summary>
+        ///     Gets or sets the reference to the control thats going to be used to invoke the callback in UI thread
+        /// </summary>
+        protected object TargetControl
+        {
+            get { return _targetControl; }
+            set
             {
-                this.SetObject(o);
+                _invokeRequiredProperty = value.GetType()
+                    .GetProperty("InvokeRequired", BindingFlags.Instance | BindingFlags.Public);
+                _invokeMethod = value.GetType()
+                    .GetMethod(
+                        "Invoke",
+                        BindingFlags.Instance | BindingFlags.Public,
+                        Type.DefaultBinder,
+                        new[] {typeof (Delegate)},
+                        null);
+                if (_invokeRequiredProperty != null && _invokeMethod != null)
+                {
+                    _targetControl = value;
+                }
             }
         }
 
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SafeInvoker"/> class.
+        ///     Gets the reference to the callback to be invoked
         /// </summary>
-        /// <param name="del">
-        /// The float2D setter delegate.
-        /// </param>
-        /// <param name="o">
-        /// The responsible object.
-        /// </param>
-        public SafeInvoker(Setter2D del, object o = null)
+        protected Delegate UnderlyingDelegate { get; }
+
+        /// <summary>
+        ///     Invoke the contained callback
+        /// </summary>
+        public virtual void Invoke()
         {
-            this.underlyingDelegate = del;
-            if (o != null)
-            {
-                this.SetObject(o);
-            }
+            Invoke(null);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SafeInvoker"/> class.
+        ///     Invoke the referenced callback
         /// </summary>
-        /// <param name="del">
-        /// The float3D setter delegate.
-        /// </param>
-        /// <param name="o">
-        /// The responsible object.
-        /// </param>
-        public SafeInvoker(Setter3D del, object o = null)
-        {
-            this.underlyingDelegate = del;
-            if (o != null)
-            {
-                this.SetObject(o);
-            }
-        }
-
-        #endregion
-
-        #region Delegates
-
-        /// <summary>
-        /// The void delegate
-        /// </summary>
-        public delegate void Callback();
-
-        /// <summary>
-        /// The 1D setter delegate
-        /// </summary>
-        /// <param name="value">
-        /// The value.
-        /// </param>
-        public delegate void Setter(float value);
-
-        /// <summary>
-        /// The 2D setter delegate
-        /// </summary>
-        /// <param name="value">
-        /// The 2D value.
-        /// </param>
-        public delegate void Setter2D(float2D value);
-
-        /// <summary>
-        /// The 3D setter delegate
-        /// </summary>
-        /// <param name="value">
-        /// The 3D value.
-        /// </param>
-        public delegate void Setter3D(float3D value);
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// The set object method. Used for setting reference object of the delegate.
-        /// </summary>
-        /// <param name="obj">
-        /// The object
-        /// </param>
-        public void SetObject(object obj)
-        {
-            this.invokeRequiredProperty = obj.GetType()
-                .GetProperty("InvokeRequired", BindingFlags.Instance | BindingFlags.Public);
-            this.invokeMethod = obj.GetType()
-                .GetMethod(
-                    "Invoke", 
-                    BindingFlags.Instance | BindingFlags.Public, 
-                    Type.DefaultBinder, 
-                    new[] { typeof(Delegate) }, 
-                    null);
-            if (this.invokeRequiredProperty != null && this.invokeMethod != null)
-            {
-                this.refObject = obj;
-            }
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Invoke the delegate
-        /// </summary>
-        /// <param name="value">
-        /// The float value
-        /// </param>
-        public void Invoke(float value)
-        {
-            this.Invoke((object)value);
-        }
-
-        /// <summary>
-        /// Invoke the delegate
-        /// </summary>
-        /// <param name="value">
-        /// The float2D value
-        /// </param>
-        public void Invoke(float2D value)
-        {
-            this.Invoke((object)value);
-        }
-
-        /// <summary>
-        /// Invoke the delegate
-        /// </summary>
-        /// <param name="value">
-        /// The float 3D value
-        /// </param>
-        public void Invoke(float3D value)
-        {
-            this.Invoke((object)value);
-        }
-
-        /// <summary>
-        /// Invoke the delegate
-        /// </summary>
-        public void Invoke()
-        {
-            this.Invoke((object)null);
-        }
-
-        /// <summary>
-        /// Invoke the delegate
-        /// </summary>
-        /// <param name="value">
-        /// The value.
-        /// </param>
-        private void Invoke(object value)
+        /// <param name="value">The argument to send to the callback</param>
+        protected void Invoke(object value)
         {
             try
             {
                 ThreadPool.QueueUserWorkItem(
                     state =>
+                    {
+                        if (TargetControl != null && (bool) _invokeRequiredProperty.GetValue(TargetControl, null))
                         {
-                            if (this.refObject != null && (bool)this.invokeRequiredProperty.GetValue(this.refObject, null))
-                            {
-                                this.invokeMethod.Invoke(
-                                    this.refObject, 
-                                    new object[] { new Action(() => this.underlyingDelegate.DynamicInvoke(value != null ? new[] { value } : null)) });
-                                return;
-                            }
-
-                            this.underlyingDelegate.DynamicInvoke(value != null ? new[] { value } : null);
-                        });
+                            _invokeMethod.Invoke(
+                                TargetControl,
+                                new object[]
+                                {
+                                    new Action(
+                                        () => UnderlyingDelegate.DynamicInvoke(value != null ? new[] {value} : null))
+                                });
+                            return;
+                        }
+                        UnderlyingDelegate.DynamicInvoke(value != null ? new[] {value} : null);
+                    });
             }
-            catch (Exception)
+            catch
             {
+                // ignored
             }
         }
-
-        #endregion
     }
 }

@@ -1,197 +1,97 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Timer.cs" company="Soroush Falahati (soroush@falahati.net)">
-//   This library is free software; you can redistribute it and/or
-//   modify it under the terms of the GNU Lesser General Public
-//   License as published by the Free Software Foundation; either
-//   version 2.1 of the License, or (at your option) any later version.
-//   
-//   This library is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//   Lesser General Public License for more details.
-// </copyright>
-// <summary>
-//   The global timer class for all animator objects
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace WinFormAnimation
 {
-    #region
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-
-    #endregion
-
     /// <summary>
-    /// The timer class, will execute your code in specific time frames
+    ///     The timer class, will execute your code in specific time frames
     /// </summary>
     public class Timer
     {
-        #region Static Fields
+        private static Thread _timerThread;
 
-        /// <summary>
-        /// The time when this class first initialized
-        /// </summary>
+        private static readonly object LockHandle = new object();
+
         private static readonly long StartTimeAsMs = DateTime.Now.Ticks;
 
-        /// <summary>
-        /// The list of all sub classes waiting for the timer tick
-        /// </summary>
         private static readonly List<Timer> Subscribers = new List<Timer>();
 
-        /// <summary>
-        /// The thread which real timer works at
-        /// </summary>
-        private static Thread timerThread;
-
-        #endregion
-
-        #region Fields
+        private readonly Action<ulong> _callback;
 
         /// <summary>
-        /// The callback delegate to run when a tick happens
-        /// </summary>
-        private readonly TickDelegate callback;
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Timer"/> class.
+        ///     Initializes a new instance of the <see cref="Timer" /> class.
         /// </summary>
         /// <param name="callback">
-        /// The callback to execute at each tick
+        ///     The callback to be executed at each tick
         /// </param>
-        /// <param name="maxFps">
-        /// The max tick per second
+        /// <param name="fpsKnownLimit">
+        ///     The max ticks per second
         /// </param>
-        public Timer(TickDelegate callback, FpsLimiter maxFps = FpsLimiter.Fps30)
+        public Timer(Action<ulong> callback, FPSLimiterKnownValues fpsKnownLimit = FPSLimiterKnownValues.LimitThirty)
+            : this(callback, (int) fpsKnownLimit)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Timer" /> class.
+        /// </summary>
+        /// <param name="callback">
+        ///     The callback to be executed at each tick
+        /// </param>
+        /// <param name="fpsLimit">
+        ///     The max ticks per second
+        /// </param>
+        public Timer(Action<ulong> callback, int fpsLimit)
         {
             if (callback == null)
             {
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
             }
 
-            this.callback = callback;
-            this.MaxFps = maxFps;
-            if (timerThread != null)
-                return;
-            timerThread = new Thread(ThreadCycle) { IsBackground = true };
-            timerThread.Start();
+            _callback = callback;
+            FrameLimiter = fpsLimit;
+            lock (LockHandle)
+            {
+                if (_timerThread == null)
+                {
+                    (_timerThread = new Thread(ThreadCycle) {IsBackground = true}).Start();
+                }
+            }
         }
 
-        #endregion
-
-        #region Delegates
-
         /// <summary>
-        /// The tick delegate.
-        /// </summary>
-        /// <param name="millSinceBeginning">
-        /// The mill since beginning.
-        /// </param>
-        public delegate void TickDelegate(int millSinceBeginning);
-
-        #endregion
-
-        #region Enums
-
-        /// <summary>
-        /// The fps limiter enumeration
-        /// </summary>
-        public enum FpsLimiter
-        {
-            /// <summary>
-            /// 10 frames per second
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Fps10 = 10, 
-
-            /// <summary>
-            /// 20 frames per second
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Fps20 = 20, 
-
-            /// <summary>
-            /// 30 frames per second
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Fps30 = 30, 
-
-            /// <summary>
-            /// 60 frames per second
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Fps60 = 60, 
-
-            /// <summary>
-            /// 100 frames per second
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Fps100 = 100, 
-
-            /// <summary>
-            /// 200 frames per second
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Fps200 = 200, 
-
-            /// <summary>
-            /// The max frames possible
-            /// </summary>
-            // ReSharper disable once UnusedMember.Global
-            Max = -1, 
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        /// Gets the last tick time.
+        ///     Gets the time of the last frame/tick related to the global-timer start reference
         /// </summary>
         public long LastTick { get; private set; }
 
         /// <summary>
-        /// Gets or sets the max fps.
+        ///     Gets or sets the maximum frames/ticks per second
         /// </summary>
-        public FpsLimiter MaxFps { get; set; }
+        public int FrameLimiter { get; set; }
 
         /// <summary>
-        /// Gets the start at time.
+        ///     Gets the time of the first frame/tick related to the global-timer start reference
         /// </summary>
-        public long StartAt { get; private set; }
+        public long FirstTick { get; private set; }
 
-        /// <summary>
-        /// Gets the stop at time.
-        /// </summary>
-        public long StopAt { get; private set; }
 
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// The get time difference as milliseconds.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="long"/>.
-        /// </returns>
-        public static long GetTimeDifferenceAsMs()
+        private void Tick()
         {
-            return (DateTime.Now.Ticks - StartTimeAsMs) / 10000;
+            if ((1000/FrameLimiter) < (GetTimeDifferenceAsMs() - LastTick))
+            {
+                LastTick = GetTimeDifferenceAsMs();
+                _callback((ulong) (LastTick - FirstTick));
+            }
         }
 
-        /// <summary>
-        /// The timer thread main code
-        /// </summary>
-        public static void ThreadCycle()
+        private static long GetTimeDifferenceAsMs()
+        {
+            return (DateTime.Now.Ticks - StartTimeAsMs)/10000;
+        }
+
+        private static void ThreadCycle()
         {
             while (true)
             {
@@ -203,7 +103,7 @@ namespace WinFormAnimation
                         hibernate = Subscribers.Count == 0;
                         if (!hibernate)
                         {
-                            foreach (Timer t in Subscribers.ToList())
+                            foreach (var t in Subscribers.ToList())
                             {
                                 t.Tick();
                             }
@@ -212,78 +112,58 @@ namespace WinFormAnimation
 
                     Thread.Sleep(hibernate ? 50 : 1);
                 }
-                catch (Exception)
+                catch
                 {
+                    // ignored
                 }
             }
             // ReSharper disable once FunctionNeverReturns
         }
 
         /// <summary>
-        /// The reset clock method to reset StartAt variable
+        ///     The method to reset the time of the starting frame/tick
         /// </summary>
         public void ResetClock()
         {
-            this.StartAt = GetTimeDifferenceAsMs();
+            FirstTick = GetTimeDifferenceAsMs();
         }
 
         /// <summary>
-        /// The resume method to start timer again but with automatic calculated start at property.
+        ///     The method to resume the timer after stopping it
         /// </summary>
         public void Resume()
         {
             lock (Subscribers)
                 if (!Subscribers.Contains(this))
                 {
-                    this.StartAt += GetTimeDifferenceAsMs() - this.StopAt;
-                    this.StopAt = 0;
+                    FirstTick += GetTimeDifferenceAsMs() - LastTick;
                     Subscribers.Add(this);
                 }
         }
 
         /// <summary>
-        /// The start method to start timer generating new ticks.
+        ///     The method to start the timer from the beginning
         /// </summary>
         public void Start()
         {
             lock (Subscribers)
                 if (!Subscribers.Contains(this))
                 {
+                    FirstTick = GetTimeDifferenceAsMs();
                     Subscribers.Add(this);
-                    this.StartAt = GetTimeDifferenceAsMs();
-                    this.StopAt = 0;
                 }
         }
 
         /// <summary>
-        /// The stop method to prevent timer from generate any new ticks.
+        ///     The method to stop the timer from generating any new ticks/frames
         /// </summary>
         public void Stop()
         {
             lock (Subscribers)
                 if (Subscribers.Contains(this))
                 {
-                    this.StopAt = GetTimeDifferenceAsMs();
                     Subscribers.Remove(this);
                 }
         }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// The method which comes from main thread and we pass it here to the real delegate.
-        /// </summary>
-        private void Tick()
-        {
-            if ((1000 / (int)this.MaxFps) < (GetTimeDifferenceAsMs() - this.LastTick))
-            {
-                this.LastTick = GetTimeDifferenceAsMs();
-                this.callback((int)(this.LastTick - this.StartAt));
-            }
-        }
-
-        #endregion
     }
 }

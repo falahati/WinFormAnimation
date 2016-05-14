@@ -1,235 +1,353 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Path3D.cs" company="Soroush Falahati (soroush@falahati.net)">
-//   This library is free software; you can redistribute it and/or
-//   modify it under the terms of the GNU Lesser General Public
-//   License as published by the Free Software Foundation; either
-//   version 2.1 of the License, or (at your option) any later version.
-//   
-//   This library is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//   Lesser General Public License for more details.
-// </copyright>
-// <summary>
-//   The 3D key frame/path class
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
 
 namespace WinFormAnimation
 {
-    #region
-
-    using System.Drawing;
-
-    #endregion
-
     /// <summary>
-    /// The 3D key frame/path class
+    ///     The Path3D class is a representation of a line in a 3D plane and the
+    ///     speed in which the animator plays it
     /// </summary>
     public class Path3D
     {
-        #region Constructors and Destructors
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="Path3D"/> class.
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
         /// </summary>
         /// <param name="startX">
-        /// The starting value of X.
+        ///     The starting horizontal value
         /// </param>
         /// <param name="endX">
-        /// The ending value of X.
+        ///     The ending horizontal value
         /// </param>
         /// <param name="startY">
-        /// The starting value of Y.
+        ///     The starting vertical value
         /// </param>
         /// <param name="endY">
-        /// The ending value of Y.
+        ///     The ending vertical value
         /// </param>
         /// <param name="startZ">
-        /// The starting value of Z.
+        ///     The starting depth value
         /// </param>
         /// <param name="endZ">
-        /// The ending value of Z.
-        /// </param>
-        /// <param name="durationX">
-        /// The duration of X changes.
-        /// </param>
-        /// <param name="durationY">
-        /// The duration of Y changes.
-        /// </param>
-        /// <param name="durationZ">
-        /// The duration of Z changes.
-        /// </param>
-        /// <param name="delayX">
-        /// The delay of X changes.
-        /// </param>
-        /// <param name="delayY">
-        /// The delay of Y changes.
-        /// </param>
-        /// <param name="delayZ">
-        /// The delay of Z changes.
-        /// </param>
-        /// <param name="functionX">
-        /// The animation function of X.
-        /// </param>
-        /// <param name="functionY">
-        /// The animation function of Y.
-        /// </param>
-        /// <param name="functionZ">
-        /// The animation function of Z.
-        /// </param>
-        // ReSharper disable once UnusedMember.Global
-        public Path3D(
-            float startX, 
-            float endX, 
-            float startY, 
-            float endY, 
-            float startZ, 
-            float endZ, 
-            float durationX, 
-            float durationY, 
-            float durationZ, 
-            float delayX = 0, 
-            float delayY = 0, 
-            float delayZ = 0, 
-            Functions.Function functionX = null, 
-            Functions.Function functionY = null, 
-            Functions.Function functionZ = null)
-            : this(
-                new Path(startX, endX, durationX, delayX, functionX), 
-                new Path(startY, endY, durationY, delayY, functionY), 
-                new Path(startZ, endZ, durationZ, delayZ, functionZ))
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Path3D"/> class.
-        /// </summary>
-        /// <param name="startX">
-        /// The starting value of X.
-        /// </param>
-        /// <param name="endX">
-        /// The ending value of X.
-        /// </param>
-        /// <param name="startY">
-        /// The starting value of Y.
-        /// </param>
-        /// <param name="endY">
-        /// The ending value of Y.
-        /// </param>
-        /// <param name="startZ">
-        /// The starting value of Z.
-        /// </param>
-        /// <param name="endZ">
-        /// The ending value of Z.
+        ///     The ending depth value
         /// </param>
         /// <param name="duration">
-        /// The duration of changes.
+        ///     The time in miliseconds that the animator must play this path
         /// </param>
         /// <param name="delay">
-        /// The delay of changes.
+        ///     The time in miliseconds that the animator must wait before playing this path
         /// </param>
         /// <param name="function">
-        /// The animation function.
+        ///     The animation function
         /// </param>
-        // ReSharper disable once UnusedMember.Global
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
         public Path3D(
-            float startX, 
-            float endX, 
-            float startY, 
-            float endY, 
-            float startZ, 
-            float endZ, 
-            float duration, 
-            float delay = 0, 
-            Functions.Function function = null)
+            float startX,
+            float endX,
+            float startY,
+            float endY,
+            float startZ,
+            float endZ,
+            float duration,
+            float delay,
+            AnimationFunctions.Function function)
             : this(
-                new Path(startX, endX, duration, delay, function), 
-                new Path(startY, endY, duration, delay, function), 
+                new Path(startX, endX, duration, delay, function),
+                new Path(startY, endY, duration, delay, function),
                 new Path(startZ, endZ, duration, delay, function))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Path3D"/> class.
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
         /// </summary>
-        /// <param name="start">
-        /// The start color
+        /// <param name="startX">
+        ///     The starting horizontal value
         /// </param>
-        /// <param name="end">
-        /// The end color
+        /// <param name="endX">
+        ///     The ending horizontal value
+        /// </param>
+        /// <param name="startY">
+        ///     The starting vertical value
+        /// </param>
+        /// <param name="endY">
+        ///     The ending vertical value
+        /// </param>
+        /// <param name="startZ">
+        ///     The starting depth value
+        /// </param>
+        /// <param name="endZ">
+        ///     The ending depth value
         /// </param>
         /// <param name="duration">
-        /// The duration of changes
+        ///     The time in miliseconds that the animator must play this path
         /// </param>
         /// <param name="delay">
-        /// The delay of changes.
+        ///     The time in miliseconds that the animator must wait before playing this path
         /// </param>
-        /// <param name="function">
-        /// The animation function.
-        /// </param>
-        public Path3D(Color start, Color end, float duration, float delay = 0, Functions.Function function = null)
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(
+            float startX,
+            float endX,
+            float startY,
+            float endY,
+            float startZ,
+            float endZ,
+            float duration,
+            float delay)
             : this(
-                new Path(start.R, end.R, duration, delay, function), 
-                new Path(start.G, end.G, duration, delay, function), 
-                new Path(start.B, end.B, duration, delay, function))
+                new Path(startX, endX, duration, delay),
+                new Path(startY, endY, duration, delay),
+                new Path(startZ, endZ, duration, delay))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Path3D"/> class.
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
+        /// </summary>
+        /// <param name="startX">
+        ///     The starting horizontal value
+        /// </param>
+        /// <param name="endX">
+        ///     The ending horizontal value
+        /// </param>
+        /// <param name="startY">
+        ///     The starting vertical value
+        /// </param>
+        /// <param name="endY">
+        ///     The ending vertical value
+        /// </param>
+        /// <param name="startZ">
+        ///     The starting depth value
+        /// </param>
+        /// <param name="endZ">
+        ///     The ending depth value
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="function">
+        ///     The animation function
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(
+            float startX,
+            float endX,
+            float startY,
+            float endY,
+            float startZ,
+            float endZ,
+            float duration,
+            AnimationFunctions.Function function)
+            : this(
+                new Path(startX, endX, duration, function),
+                new Path(startY, endY, duration, function),
+                new Path(startZ, endZ, duration, function))
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
+        /// </summary>
+        /// <param name="startX">
+        ///     The starting horizontal value
+        /// </param>
+        /// <param name="endX">
+        ///     The ending horizontal value
+        /// </param>
+        /// <param name="startY">
+        ///     The starting vertical value
+        /// </param>
+        /// <param name="endY">
+        ///     The ending vertical value
+        /// </param>
+        /// <param name="startZ">
+        ///     The starting depth value
+        /// </param>
+        /// <param name="endZ">
+        ///     The ending depth value
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(
+            float startX,
+            float endX,
+            float startY,
+            float endY,
+            float startZ,
+            float endZ,
+            float duration)
+            : this(new Path(startX, endX, duration), new Path(startY, endY, duration), new Path(startZ, endZ, duration))
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting point in a 3D plane
+        /// </param>
+        /// <param name="end">
+        ///     The ending point in a 3D plane
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="delay">
+        ///     The time in miliseconds that the animator must wait before playing this path
+        /// </param>
+        /// <param name="function">
+        ///     The animation function
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(Float3D start, Float3D end, float duration, float delay, AnimationFunctions.Function function)
+            : this(
+                new Path(start.X, end.X, duration, delay, function),
+                new Path(start.Y, end.Y, duration, delay, function),
+                new Path(start.Z, end.Z, duration, delay, function))
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting point in a 3D plane
+        /// </param>
+        /// <param name="end">
+        ///     The ending point in a 3D plane
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="delay">
+        ///     The time in miliseconds that the animator must wait before playing this path
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(Float3D start, Float3D end, float duration, float delay)
+            : this(
+                new Path(start.X, end.X, duration, delay),
+                new Path(start.Y, end.Y, duration, delay),
+                new Path(start.Z, end.Z, duration, delay))
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting point in a 3D plane
+        /// </param>
+        /// <param name="end">
+        ///     The ending point in a 3D plane
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <param name="function">
+        ///     The animation function
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(Float3D start, Float3D end, float duration, AnimationFunctions.Function function)
+            : this(
+                new Path(start.X, end.X, duration, function),
+                new Path(start.Y, end.Y, duration, function),
+                new Path(start.Z, end.Z, duration, function))
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
+        /// </summary>
+        /// <param name="start">
+        ///     The starting point in a 3D plane
+        /// </param>
+        /// <param name="end">
+        ///     The ending point in a 3D plane
+        /// </param>
+        /// <param name="duration">
+        ///     The time in miliseconds that the animator must play this path
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     Duration is less than zero
+        /// </exception>
+        public Path3D(Float3D start, Float3D end, float duration)
+            : this(
+                new Path(start.X, end.X, duration),
+                new Path(start.Y, end.Y, duration),
+                new Path(start.Z, end.Z, duration))
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Path3D" /> class.
         /// </summary>
         /// <param name="x">
-        /// The X path
+        ///     The horizontal path.
         /// </param>
         /// <param name="y">
-        /// The Y path
+        ///     The vertical path.
         /// </param>
         /// <param name="z">
-        /// The Z path
+        ///     The depth path.
         /// </param>
         public Path3D(Path x, Path y, Path z)
         {
-            this.XAxis = x;
-            this.YAxis = y;
-            this.ZAxis = z;
+            HorizontalPath = x;
+            VerticalPath = y;
+            DepthPath = z;
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        /// Gets the x axis.
+        ///     Gets the horizontal path
         /// </summary>
-        public Path XAxis { get; private set; }
+        public Path HorizontalPath { get; }
 
         /// <summary>
-        /// Gets the y axis.
+        ///     Gets the vertical path
         /// </summary>
-        public Path YAxis { get; private set; }
+        public Path VerticalPath { get; }
 
         /// <summary>
-        /// Gets the z axis.
+        ///     Gets the depth path
         /// </summary>
-        public Path ZAxis { get; private set; }
+        public Path DepthPath { get; }
 
-        #endregion
-
-        #region Public Methods and Operators
 
         /// <summary>
-        /// The reverse.
+        ///     Gets the starting point of the path
+        /// </summary>
+        public Float3D Start => new Float3D(HorizontalPath.Start, VerticalPath.Start, DepthPath.Start);
+
+
+        /// <summary>
+        ///     Gets the ending point of the path
+        /// </summary>
+        public Float3D End => new Float3D(HorizontalPath.End, VerticalPath.End, DepthPath.End);
+
+        /// <summary>
+        ///     Creates and returns a new <see cref="Path3D" /> based on the current path but in reverse order
         /// </summary>
         /// <returns>
-        /// The <see cref="Path3D"/>.
+        ///     A new <see cref="Path" /> which is the reverse of the current <see cref="Path3D" />
         /// </returns>
-        // ReSharper disable once UnusedMember.Global
         public Path3D Reverse()
         {
-            return new Path3D(this.XAxis.Reverse(), this.YAxis.Reverse(), this.ZAxis.Reverse());
+            return new Path3D(HorizontalPath.Reverse(), VerticalPath.Reverse(), DepthPath.Reverse());
         }
-
-        #endregion
     }
 }
