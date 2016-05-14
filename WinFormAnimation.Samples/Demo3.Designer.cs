@@ -20,8 +20,6 @@
             base.Dispose(disposing);
         }
 
-        #region Component Designer generated code
-
         /// <summary> 
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
@@ -43,7 +41,7 @@
             this.btn_play.TabIndex = 5;
             this.btn_play.Text = ">";
             this.btn_play.UseVisualStyleBackColor = true;
-            this.btn_play.Click += new System.EventHandler(this.btn_play_Click);
+            this.btn_play.Click += new System.EventHandler(this.PlayButton);
             // 
             // btn_stop
             // 
@@ -54,7 +52,7 @@
             this.btn_stop.TabIndex = 4;
             this.btn_stop.Text = "□";
             this.btn_stop.UseVisualStyleBackColor = true;
-            this.btn_stop.Click += new System.EventHandler(this.btn_stop_Click);
+            this.btn_stop.Click += new System.EventHandler(this.StopButton);
             // 
             // btn_pause
             // 
@@ -64,7 +62,7 @@
             this.btn_pause.TabIndex = 6;
             this.btn_pause.Text = "| |";
             this.btn_pause.UseVisualStyleBackColor = true;
-            this.btn_pause.Click += new System.EventHandler(this.btn_pause_Click);
+            this.btn_pause.Click += new System.EventHandler(this.PauseButton);
             // 
             // btn_resume
             // 
@@ -74,7 +72,7 @@
             this.btn_resume.TabIndex = 7;
             this.btn_resume.Text = ">";
             this.btn_resume.UseVisualStyleBackColor = true;
-            this.btn_resume.Click += new System.EventHandler(this.btn_resume_Click);
+            this.btn_resume.Click += new System.EventHandler(this.ResumeButton);
             // 
             // p_color
             // 
@@ -94,13 +92,12 @@
             this.Controls.Add(this.btn_stop);
             this.Controls.Add(this.btn_pause);
             this.Controls.Add(this.btn_resume);
+            this.DoubleBuffered = true;
             this.Name = "Demo3";
             this.Size = new System.Drawing.Size(241, 63);
             this.ResumeLayout(false);
 
         }
-
-        #endregion
 
         private System.Windows.Forms.Button btn_play;
         private System.Windows.Forms.Button btn_stop;

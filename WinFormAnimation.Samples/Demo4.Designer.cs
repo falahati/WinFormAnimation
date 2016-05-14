@@ -20,8 +20,6 @@
             base.Dispose(disposing);
         }
 
-        #region Component Designer generated code
-
         /// <summary> 
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
@@ -186,7 +184,7 @@
             this.btn_run.TabIndex = 10;
             this.btn_run.Text = "RUN";
             this.btn_run.UseVisualStyleBackColor = true;
-            this.btn_run.Click += new System.EventHandler(this.btn_run_Click);
+            this.btn_run.Click += new System.EventHandler(this.RunButton);
             // 
             // lbl_time
             // 
@@ -232,8 +230,6 @@
             this.PerformLayout();
 
         }
-
-        #endregion
 
         private System.Windows.Forms.NumericUpDown nud_fps;
         private System.Windows.Forms.Label label1;

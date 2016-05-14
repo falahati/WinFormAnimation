@@ -5,13 +5,16 @@ namespace WinFormAnimation.Samples
 {
     public partial class frm_Main : Form
     {
+        private readonly Animator _opacityAnimator = new Animator(new Path(0, 1, 400, 100));
+
         public frm_Main()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void FormShown(object sender, EventArgs e)
         {
+            _opacityAnimator.Play(this, Animator.KnownProperties.Opacity);
         }
     }
 }

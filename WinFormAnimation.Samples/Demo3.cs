@@ -1,42 +1,44 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormAnimation.Samples
 {
-    public partial class Demo3 : UserControl
+    internal partial class Demo3 : UserControl
     {
-        private readonly Animator3D ani = new Animator3D(Timer.FpsLimiter.Fps30);
+        private readonly Animator3D _animator = new Animator3D();
 
         public Demo3()
         {
             InitializeComponent();
         }
 
-        private void btn_play_Click(object sender, EventArgs e)
+        private void PlayButton(object sender, EventArgs e)
         {
-            ani.Stop();
-            ani.SetPaths(new Path3D(Color.Aqua, Color.FromArgb(255, 128, 0), 3000));
-            ani.Play(p_color, Animator3D.KnownProperties.BackColor, new SafeInvoker(() =>
+            _animator.Stop();
+            _animator.Paths =
+                new Path3D(Color.Aqua.ToFloat3D(), Color.FromArgb(255, 128, 0).ToFloat3D(), 3000).ToArray();
+            _animator.Play(p_color, Animator3D.KnownProperties.BackColor, new SafeInvoker(() =>
             {
-                ani.SetPaths(new Path3D(Color.FromArgb(255, 128, 0), Color.Aqua, 1000, 1000));
-                ani.Play(p_color, Animator3D.KnownProperties.BackColor);
+                _animator.Paths = _animator.Paths.Last().Reverse().ToArray();
+                _animator.Play(p_color, Animator3D.KnownProperties.BackColor);
             }));
         }
 
-        private void btn_stop_Click(object sender, EventArgs e)
+        private void StopButton(object sender, EventArgs e)
         {
-            ani.Stop();
+            _animator.Stop();
         }
 
-        private void btn_resume_Click(object sender, EventArgs e)
+        private void ResumeButton(object sender, EventArgs e)
         {
-            ani.Resume();
+            _animator.Resume();
         }
 
-        private void btn_pause_Click(object sender, EventArgs e)
+        private void PauseButton(object sender, EventArgs e)
         {
-            ani.Pause();
+            _animator.Pause();
         }
     }
 }

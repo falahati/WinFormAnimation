@@ -1,62 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormAnimation.Samples
 {
-    public partial class Demo4 : UserControl
+    internal partial class Demo4 : UserControl
     {
-        private readonly List<Animator> aniList = new List<Animator>();
-        private readonly Process cp = Process.GetCurrentProcess();
-        private int cpu;
-        private int ends;
-        private int hits;
-        private readonly Stopwatch sw = new Stopwatch();
+        private readonly List<Animator> _animators = new List<Animator>();
+        private readonly Process _currentProcess = Process.GetCurrentProcess();
+        private readonly Stopwatch _stopWatch = new Stopwatch();
+        private int _cpuUsage;
+        private int _endedAnimations;
+        private int _frameHits;
 
         public Demo4()
         {
             InitializeComponent();
         }
 
-        private void btn_run_Click(object sender, EventArgs e)
+        private void RunButton(object sender, EventArgs e)
         {
             Enabled = false;
-            aniList.Clear();
-            hits = 0;
-            ends = 0;
+            _animators.Clear();
+            _frameHits = 0;
+            _endedAnimations = 0;
             var rnd = new Random();
             for (var i = 0; i < nud_num.Value; i++)
             {
-                aniList.Add(new Animator((Timer.FpsLimiter) nud_fps.Value));
-                aniList.Last().SetPaths(new Path(rnd.Next(1000), rnd.Next(1000), (float) nud_dur.Value));
+                _animators.Add(new Animator((FPSLimiterKnownValues) nud_fps.Value)
+                {
+                    Paths = new[] {new Path(rnd.Next(1000), rnd.Next(1000), (float) nud_dur.Value)}
+                });
             }
-            cpu = (int) cp.TotalProcessorTime.TotalMilliseconds;
-            sw.Reset();
-            sw.Start();
-            aniList.ForEach((Animator a) => { a.Play(new SafeInvoker(Hit, this), new SafeInvoker(End, this)); });
+            _cpuUsage = (int) _currentProcess.TotalProcessorTime.TotalMilliseconds;
+            _stopWatch.Reset();
+            _stopWatch.Start();
+            _animators.ForEach(a => { a.Play(new SafeInvoker<float>(Hit, this), new SafeInvoker(End, this)); });
         }
 
         private void Hit(float value)
         {
-            hits += 1;
+            _frameHits += 1;
         }
 
         private void End()
         {
-            ends += 1;
-            if (ends == nud_num.Value)
+            _endedAnimations += 1;
+            if (_endedAnimations == nud_num.Value)
             {
-                sw.Stop();
-                lbl_fps.Text = Round(hits/((sw.ElapsedMilliseconds/1000)*nud_num.Value)) + " fps";
-                lbl_time.Text = sw.ElapsedMilliseconds + " ms";
-                lbl_cpu.Text = Round((decimal) ((cp.TotalProcessorTime.TotalMilliseconds - cpu)/sw.ElapsedMilliseconds)*
-                                     (100/Environment.ProcessorCount))
-                               + " % - " + Environment.ProcessorCount + " Cores";
+                _stopWatch.Stop();
+                lbl_fps.Text =
+                    $"{Round((decimal) (_frameHits/((_stopWatch.ElapsedMilliseconds/1000f)*(double) nud_num.Value)))} fps";
+                lbl_time.Text = $"{_stopWatch.ElapsedMilliseconds} ms";
+                lbl_cpu.Text =
+                    $"{Round((decimal) ((_currentProcess.TotalProcessorTime.TotalMilliseconds - _cpuUsage)/_stopWatch.ElapsedMilliseconds)*(decimal) (100f/Environment.ProcessorCount))} % - {Environment.ProcessorCount} Cores";
                 Enabled = true;
             }
         }
+
 
         private float Round(decimal n)
         {

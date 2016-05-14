@@ -3,35 +3,50 @@ using System.Windows.Forms;
 
 namespace WinFormAnimation.Samples
 {
-    public partial class Demo2 : UserControl
+    internal partial class Demo2 : UserControl
     {
-        private readonly Animator2D ani = new Animator2D(Timer.FpsLimiter.Fps100);
+        private readonly Animator2D _animator = new Animator2D();
 
         public Demo2()
         {
             InitializeComponent();
-            ani.SetPaths(new Path2D(70, 320, 5, 115, 2000, 2000, 0, 0, Functions.CubicEaseOut, Functions.CubicEaseIn),
-                new Path2D(320, 70, 115, 5, 2000, 1700, 300, 600, Functions.Liner, Functions.ExponentialEaseInOut));
+            _animator.Paths = new Path2D(
+                new Path(70, 320, 2000, AnimationFunctions.CubicEaseOut),
+                new Path(5, 100, 2000, AnimationFunctions.CubicEaseIn))
+                .ContinueTo(new Path2D(
+                    new Path(320, 70, 2000, 300, AnimationFunctions.ExponentialEaseInOut),
+                    new Path(100, 5, 1700, 600, AnimationFunctions.Liner)));
         }
 
-        private void btn_play_Click(object sender, EventArgs e)
+        private void PlayButton(object sender, EventArgs e)
         {
-            ani.Play(pb_image, Animator2D.KnownProperties.Location);
+            _animator.Play(pb_image, Animator2D.KnownProperties.Location);
         }
 
-        private void btn_stop_Click(object sender, EventArgs e)
+        private void StopButton(object sender, EventArgs e)
         {
-            ani.Stop();
+            _animator.Stop();
         }
 
-        private void btn_resume_Click(object sender, EventArgs e)
+        private void ResumeButton(object sender, EventArgs e)
         {
-            ani.Resume();
+            _animator.Resume();
         }
 
-        private void btn_pause_Click(object sender, EventArgs e)
+        private void PauseButton(object sender, EventArgs e)
         {
-            ani.Pause();
+            _animator.Pause();
+        }
+
+        private void RepeatChecked(object sender, EventArgs e)
+        {
+            _animator.Repeat = cb_repeat.Checked;
+            cb_reverse.Enabled = cb_repeat.Checked;
+        }
+
+        private void ReverseChecked(object sender, EventArgs e)
+        {
+            _animator.ReverseRepeat = cb_reverse.Checked;
         }
     }
 }
