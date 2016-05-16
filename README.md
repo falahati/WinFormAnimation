@@ -1,4 +1,4 @@
-# <img src="WinFormAnimation/Icon.png" width="42" style="margin-bottom: -8px;" alt="Icon"> WinForm Animation Library [.Net3.5+]
+# <img src="WinFormAnimation/Icon.png" width="42" alt="Icon"> WinForm Animation Library [.Net3.5+]
 A simple library for animating controls/values in .Net WinForm (.Net 3.5 and later). Key frame (Path) based and fully customizable.
 
 *Please note that even though this library designed for WinForm but its usage is not limited to WinForm and can be used in other environments. Only reference of the library is to 'System.Drawing' name space.*
