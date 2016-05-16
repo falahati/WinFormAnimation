@@ -8,7 +8,7 @@ This library is available as a NuGet package at [nuget.org](https://www.nuget.or
 Source code of this library is publicly available at [github.com](https://github.com/falahati/WinFormAnimation/).
 
 #### MORE INFO
-Check out the project wep page at [github.io](http://falahati.github.io/WinFormAnimation/).
+Check out the project’s web page at [github.io](http://falahati.github.io/WinFormAnimation/).
 
 ### LICENSE
 The MIT License (MIT)
