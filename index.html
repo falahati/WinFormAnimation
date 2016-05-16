@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>WinForm Animation Library [.Net3.5+] by falahati</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">WinForm Animation Library [.Net3.5+]</h1>
+      <h2 class="project-tagline">A simple library for animating controls/values in .Net WinForm (.Net 3.5 and later). Key frame (Path) based and fully customizable.</h2>
+      <a href="https://github.com/falahati/WinFormAnimation" class="btn">View on GitHub</a>
+      <a href="https://github.com/falahati/WinFormAnimation/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/falahati/WinFormAnimation/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="-winform-animation-library-net35" class="anchor" href="#-winform-animation-library-net35" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><img src="https://github.com/falahati/WinFormAnimation/blob/master/WinFormAnimation/Icon.png?raw=true" width="42" alt="Icon"> WinForm Animation Library [.Net3.5+]</h1>
+
+<p>A simple library for animating controls/values in .Net WinForm (.Net 3.5 and later). Key frame (Path) based and fully customizable.</p>
+
+<p><em>Please note that even though this library designed for WinForm but its usage is not limited to WinForm and can be used in other environments. Only reference of the library is to 'System.Drawing' name space.</em></p>
+
+<h3>
+<a id="where-to-find" class="anchor" href="#where-to-find" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>WHERE TO FIND</h3>
+
+<p>This library is available as a NuGet package at <a href="https://www.nuget.org/packages/WinFormAnimation/">nuget.org</a>.</p>
+
+<h3>
+<a id="main-classes" class="anchor" href="#main-classes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>MAIN CLASSES</h3>
+
+<ul>
+<li>
+<code>Float2D</code>: A class containing two <code>float</code> values as Vertical and Horizontal coordinates representing a point in a 2D plane</li>
+<li>
+<code>Float3D</code>: A class containing three <code>float</code> values as Vertical, Horizontal and Depth coordinates representing a point in a 3D plane</li>
+<li>
+<code>Path</code>: A class containing a <code>float</code> starting and a <code>float</code> ending point for an animation as well as duration and the function to control the animation.</li>
+<li>
+<code>Path2D</code>: A class containing a <code>Float2D</code> starting and a <code>Float2D</code> ending point for an animation as well as duration and the function to control the animation.</li>
+<li>
+<code>Path3D</code>: A class containing a <code>Float3D</code> starting and a <code>Float3D</code> ending point for an animation as well as duration and the function to control the animation.</li>
+<li>
+<code>Animator</code>: A class for animating an array of <code>Path</code> objects. This class is one of the main classes and starting points of a basic animation.</li>
+<li>
+<code>Animator2D</code>: A class for animating an array of <code>Path</code> objects. This class is one of the main classes and starting points of a basic animation.</li>
+<li>
+<code>Animator2D</code>: A class for animating an array of <code>Path</code> objects. This class is one of the main classes and starting points of a basic animation.</li>
+<li>
+<code>SafeInvoker</code>: A class holding a reference to a function to invoke in the correct thread, detected by a <code>Control</code> object passed to it. Useful for easier UI manipulations.</li>
+<li>
+<code>SafeInvoker&lt;T&gt;</code>: Same as <code>SafeInvoker</code> class but with a generic argument for the function to invoke.</li>
+</ul>
+
+<p>For full documentation of the classes and their members, please take a look at our doxygen page at <a href="https://falahati.github.io/WinFormAnimation/doxygen">falahati.github.io</a>.</p>
+
+<h4>
+<a id="basic-examples" class="anchor" href="#basic-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>BASIC EXAMPLES</h4>
+
+<h5>
+<a id="one-dimensional-animation-of-a-property" class="anchor" href="#one-dimensional-animation-of-a-property" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ONE DIMENSIONAL ANIMATION OF A PROPERTY</h5>
+
+<p>Following code animates a property named <code>Value</code> of a <code>ProgressBar</code> named <code>pb_progress</code> in 5 seconds from zero to one hundred:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">new</span> Animator(<span class="pl-k">new</span> Path(<span class="pl-c1">0</span>, <span class="pl-c1">100</span>, <span class="pl-c1">5000</span>))
+    .Play(pb_progress, Animator.KnownProperties.Value);</pre></div>
+
+<h5>
+<a id="two-dimensional-animation-of-a-property" class="anchor" href="#two-dimensional-animation-of-a-property" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TWO DIMENSIONAL ANIMATION OF A PROPERTY</h5>
+
+<p>Following code animates a <code>Form</code> in two paths. First one moves the <code>Form</code> from (0, -100) to (100, 200) and second path waits for 3 seconds and then moved the <code>Form</code> to its initial location in 2 seconds. (<code>this</code> is a <code>Form</code>)</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">new</span> Animator2D(
+        <span class="pl-k">new</span> Path2D(<span class="pl-c1">0</span>, <span class="pl-c1">100</span>, -<span class="pl-c1">100</span>, <span class="pl-c1">200</span>, <span class="pl-c1">5000</span>).ContinueTo(<span class="pl-c1">this</span>.Location.ToFloat2D(), <span class="pl-c1">2000</span>, <span class="pl-c1">3000</span>))
+    .Play(<span class="pl-c1">this</span>, Animator2D.KnownProperties.Location);</pre></div>
+
+<h5>
+<a id="three-dimensional-animation-of-a-property" class="anchor" href="#three-dimensional-animation-of-a-property" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>THREE DIMENSIONAL ANIMATION OF A PROPERTY</h5>
+
+<p>Following code animates a property named <code>CustomColor</code> of a <code>Control</code> named <code>c_customLabel</code> in 2 seconds and after a delay of 1 second using the <code>AnimationFunctions.CubicEaseIn</code> function and with maximum of 10 frames per second.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">new</span> Animator3D(
+        <span class="pl-k">new</span> Path3D(Color.Blue.ToFloat3D(), Color.Red.ToFloat3D(), <span class="pl-c1">2000</span>, <span class="pl-c1">1000</span>, AnimationFunctions.CubicEaseIn), 
+        FPSLimiterKnownValues.LimitTen)
+    .Play(c_customLabel, <span class="pl-s"><span class="pl-pds">"</span>CustomColor<span class="pl-pds">"</span></span>);</pre></div>
+
+<h5>
+<a id="keyframes" class="anchor" href="#keyframes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>KEYFRAMES</h5>
+
+<p>There are extension methods for <code>Path</code>, <code>Path2D</code>, <code>Path3D</code> and their arrays to let you continue the path easily and define the key frames as fast as possible. For example, following code moves a <code>Control</code> named <code>c_control</code> in a rectangular path infinitely:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">new</span> Animator2D(
+    <span class="pl-k">new</span> Path2D(<span class="pl-k">new</span> Float2D(<span class="pl-c1">100</span>, <span class="pl-c1">100</span>), <span class="pl-k">new</span> Float2D(<span class="pl-c1">200</span>, <span class="pl-c1">100</span>), <span class="pl-c1">1000</span>)
+        .ContinueTo(<span class="pl-k">new</span> Float2D(<span class="pl-c1">200</span>, <span class="pl-c1">200</span>), <span class="pl-c1">1000</span>)
+        .ContinueTo(<span class="pl-k">new</span> Float2D(<span class="pl-c1">100</span>, <span class="pl-c1">200</span>), <span class="pl-c1">1000</span>)
+        .ContinueTo(<span class="pl-k">new</span> Float2D(<span class="pl-c1">100</span>, <span class="pl-c1">100</span>), <span class="pl-c1">1000</span>))
+{
+    Repeat = <span class="pl-c1">true</span>
+}.Play(c_control, Animator2D.KnownProperties.Location);</pre></div>
+
+<h5>
+<a id="callbacks" class="anchor" href="#callbacks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>CALLBACKS</h5>
+
+<p>It is possible to define a custom callback as frame handler as well as defining a call back to handle the end of the animation. Following example will call a method named <code>CustomSetMethod</code> for setting new values and handle the frames, and starts the animation in reverse path after its end for one more time:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">var</span> animator = <span class="pl-k">new</span> Animator(<span class="pl-k">new</span> Path(<span class="pl-c1">100</span>, <span class="pl-c1">200</span>, <span class="pl-c1">1000</span>).ContinueTo(<span class="pl-c1">400</span>, <span class="pl-c1">500</span>));
+animator.Play(<span class="pl-k">new</span> SafeInvoker&lt;<span class="pl-k">float</span>&gt;(CustomSetMethod), <span class="pl-k">new</span> SafeInvoker(() =&gt;
+{
+    animator.Paths = animator.Paths.Select(path =&gt; path.Reverse()).Reverse().ToArray();
+    animator.Play(<span class="pl-k">new</span> SafeInvoker&lt;<span class="pl-k">float</span>&gt;(CustomSetMethod));
+}));</pre></div>
+
+<h4>
+<a id="demo-project" class="anchor" href="#demo-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>DEMO PROJECT</h4>
+
+<p>Check the 'WinFormAnimation.Samples' project for simple usage examples.
+<img src="https://github.com/falahati/WinFormAnimation/blob/master/screenshot.gif?raw=true" alt="Screenshot" title="Screenshot"></p>
+
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LICENSE</h3>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2016 Soroush Falahati</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/falahati/WinFormAnimation">WinForm Animation Library [.Net3.5+]</a> is maintained by <a href="https://github.com/falahati">falahati</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
