@@ -1,6 +1,6 @@
 ﻿namespace WinFormAnimation.Samples
 {
-    partial class frm_Main
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
