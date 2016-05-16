@@ -4,7 +4,6 @@
         <id>WinFormAnimation</id>
         <version>0.0</version>
         <title>Key-Frame Based Animation Library (.Net 3.5+)</title>
-		<iconUrl>file://content/Icon.png</iconUrl>
         <authors>Soroush Falahati</authors>
         <licenseUrl>https://github.com/falahati/WinFormAnimation/blob/master/LICENSE</licenseUrl>
         <projectUrl>https://github.com/falahati/WinFormAnimation</projectUrl>

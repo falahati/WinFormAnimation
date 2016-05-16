@@ -1,2 +1,2 @@
 $msbuild = join-path -path (Get-ItemProperty "HKLM:\software\Microsoft\MSBuild\ToolsVersions\14.0")."MSBuildToolsPath" -childpath "msbuild.exe"
-&$msbuild WinFormAnimation\WinFormAnimation.csproj /t:Publish /p:Configuration="Release"
+&$msbuild WinFormAnimation\WinFormAnimation.csproj /t:Build /t:Package /t:Publish /p:Configuration="Release"
