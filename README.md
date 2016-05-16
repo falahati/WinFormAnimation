@@ -19,7 +19,7 @@ This library is available as a NuGet package at [nuget.org](https://www.nuget.or
 * `SafeInvoker`: A class holding a reference to a function to invoke in the correct thread, detected by a `Control` object passed to it. Useful for easier UI manipulations.
 * `SafeInvoker<T>`: Same as `SafeInvoker` class but with a generic argument for the function to invoke.
 
-For full documentation of the classes and their members, please take a look at our doxygen page at [s_falahati.github.io](https://s_falahati.github.io/WinFormAnimation/doxygen).
+For full documentation of the classes and their members, please take a look at our doxygen page at [falahati.github.io](https://falahati.github.io/WinFormAnimation/doxygen).
 
 #### BASIC EXAMPLES
 ##### ONE DIMENSIONAL ANIMATION OF A PROPERTY
