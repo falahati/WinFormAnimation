@@ -6,8 +6,8 @@
         <title>Key-Frame Based Animation Library (.Net 3.5+)</title>
         <authors>Soroush Falahati</authors>
         <licenseUrl>https://github.com/falahati/WinFormAnimation/blob/master/LICENSE</licenseUrl>
-        <projectUrl>https://github.com/falahati/WinFormAnimation</projectUrl>
-        <iconUrl>https://raw.githubusercontent.com/falahati/WinFormAnimation/master/WinFormAnimation/Icon.png</iconUrl>
+        <projectUrl>http://falahati.github.io/WinFormAnimation/</projectUrl>
+        <iconUrl>https://github.com/falahati/WinFormAnimation/blob/master/WinFormAnimation/Icon.png?raw=true</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A simple library for animating controls/values in .Net using key-frames (.Net 3.5 and later).</description>
         <language>en-US</language>
