@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -52,9 +53,7 @@ namespace WinFormAnimation
 
         private readonly Timer _timer;
 
-        private bool _holdEnded;
-
-        private bool _tempReverseRepeat = true;
+        private bool _tempReverseRepeat;
 
         /// <summary>
         ///     The callback to get invoked at the end of the animation
@@ -312,7 +311,7 @@ namespace WinFormAnimation
             }
             ActivePath = null;
             CurrentStatus = AnimatorStatus.Stopped;
-            _tempReverseRepeat = true;
+            _tempReverseRepeat = false;
         }
 
         /// <summary>
@@ -374,7 +373,6 @@ namespace WinFormAnimation
             FrameCallback = frameCallback;
             EndCallback = endCallback;
             _timer.ResetClock();
-            CurrentStatus = AnimatorStatus.Playing;
             lock (_tempPaths)
             {
                 _tempPaths.AddRange(_paths);
@@ -390,77 +388,61 @@ namespace WinFormAnimation
                 {
                     while (ActivePath == null)
                     {
-                        ActivePath = _tempPaths[0];
-                        _tempPaths.RemoveAt(0);
+                        if (_tempReverseRepeat)
+                        {
+                            ActivePath = _tempPaths.LastOrDefault();
+                            _tempPaths.RemoveAt(_tempPaths.Count - 1);
+                        }
+                        else
+                        {
+                            ActivePath = _tempPaths.FirstOrDefault();
+                            _tempPaths.RemoveAt(0);
+                        }
+                        _timer.ResetClock();
+                        millSinceBeginning = 0;
                     }
                 }
-
                 if (ActivePath != null)
                 {
-                    if (!_holdEnded)
+                    if (!_tempReverseRepeat && millSinceBeginning < ActivePath.Delay)
                     {
-                        if (ActivePath.Delay > 0)
-                        {
-                            if (millSinceBeginning > ActivePath.Delay)
-                            {
-                                _holdEnded = true;
-                                _timer.ResetClock();
-                                millSinceBeginning = 0;
-                            }
-                            else
-                            {
-                                CurrentStatus = AnimatorStatus.OnHold;
-                            }
-                        }
-                        else
-                        {
-                            _holdEnded = true;
-                        }
+                        CurrentStatus = AnimatorStatus.OnHold;
+                        return;
                     }
-
-                    if (_holdEnded)
+                    if (millSinceBeginning - (!_tempReverseRepeat ? ActivePath.Delay : 0) <= ActivePath.Duration)
                     {
-                        if (millSinceBeginning <= ActivePath.Duration)
+                        if (CurrentStatus != AnimatorStatus.Playing)
                         {
+                            FrameCallback.Invoke(_tempReverseRepeat ? ActivePath.End : ActivePath.Start);
                             CurrentStatus = AnimatorStatus.Playing;
-                            var value = ActivePath.Function(
-                                millSinceBeginning,
-                                ActivePath.Start,
-                                ActivePath.Change,
-                                ActivePath.Duration);
-                            FrameCallback.Invoke(value);
                         }
-                        else
-                        {
-                            _holdEnded = false;
-                            _timer.ResetClock();
-                            var end = ActivePath.End;
-                            ActivePath = null;
-                            FrameCallback.Invoke(end);
-                        }
+                        var value = ActivePath.Function(
+                            _tempReverseRepeat
+                                ? ActivePath.Duration - millSinceBeginning
+                                : millSinceBeginning - ActivePath.Delay,
+                            ActivePath.Start,
+                            ActivePath.Change,
+                            ActivePath.Duration);
+                        FrameCallback.Invoke(value);
+                        return;
                     }
+                    if (CurrentStatus == AnimatorStatus.Playing)
+                    {
+                        FrameCallback.Invoke(_tempReverseRepeat ? ActivePath.Start : ActivePath.End);
+                    }
+                    if (_tempReverseRepeat && (millSinceBeginning - ActivePath.Duration) < ActivePath.Delay)
+                    {
+                        CurrentStatus = AnimatorStatus.OnHold;
+                        return;
+                    }
+                    ActivePath = null;
                 }
                 else if (Repeat)
                 {
                     lock (_tempPaths)
                     {
                         _tempPaths.AddRange(_paths);
-                        if (ReverseRepeat)
-                        {
-                            if (_tempReverseRepeat)
-                            {
-                                _tempPaths.Reverse();
-                                for (var i = 0; i < _tempPaths.Count; i++)
-                                {
-                                    _tempPaths[i] = _tempPaths[i].Reverse();
-                                }
-                            }
-                            _tempReverseRepeat = !_tempReverseRepeat;
-                        }
-                        else
-                        {
-                            _tempReverseRepeat = true;
-                        }
+                        _tempReverseRepeat = ReverseRepeat && !_tempReverseRepeat;
                     }
                 }
                 else
