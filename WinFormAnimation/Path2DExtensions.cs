@@ -14,7 +14,7 @@ namespace WinFormAnimation
         /// <param name="end">Next point to follow</param>
         /// <param name="duration">Duration of the animation</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, float duration)
+        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, ulong duration)
         {
             return paths.Concat(new[] {new Path2D(paths.Last().End, end, duration)}).ToArray();
         }
@@ -27,7 +27,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, float duration,
+        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, ulong duration,
             AnimationFunctions.Function function)
         {
             return paths.Concat(new[] {new Path2D(paths.Last().End, end, duration, function)}).ToArray();
@@ -41,7 +41,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="delay">Starting delay</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, float duration, float delay)
+        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, ulong duration, float delay)
         {
             return paths.Concat(new[] {new Path2D(paths.Last().End, end, duration, delay)}).ToArray();
         }
@@ -55,7 +55,7 @@ namespace WinFormAnimation
         /// <param name="delay">Starting delay</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, float duration, float delay,
+        public static Path2D[] ContinueTo(this Path2D[] paths, Float2D end, ulong duration, float delay,
             AnimationFunctions.Function function)
         {
             return paths.Concat(new[] {new Path2D(paths.Last().End, end, duration, delay, function)}).ToArray();
@@ -69,7 +69,7 @@ namespace WinFormAnimation
         /// <param name="endY">Vertical value of the next point to follow</param>
         /// <param name="duration">Duration of the animation</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, float duration)
+        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, ulong duration)
         {
             return paths.Concat(new[] {new Path2D(paths.Last().End, new Float2D(endX, endY), duration)}).ToArray();
         }
@@ -83,7 +83,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, float duration,
+        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, ulong duration,
             AnimationFunctions.Function function)
         {
             return
@@ -100,7 +100,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="delay">Starting delay</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, float duration, float delay)
+        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, ulong duration, float delay)
         {
             return
                 paths.Concat(new[] {new Path2D(paths.Last().End, new Float2D(endX, endY), duration, delay)}).ToArray();
@@ -116,7 +116,7 @@ namespace WinFormAnimation
         /// <param name="delay">Starting delay</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, float duration, float delay,
+        public static Path2D[] ContinueTo(this Path2D[] paths, float endX, float endY, ulong duration, float delay,
             AnimationFunctions.Function function)
         {
             return
@@ -131,7 +131,7 @@ namespace WinFormAnimation
         /// <param name="end">Next point to follow</param>
         /// <param name="duration">Duration of the animation</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, Float2D end, float duration)
+        public static Path2D[] ContinueTo(this Path2D path, Float2D end, ulong duration)
         {
             return path.ToArray().ContinueTo(end, duration);
         }
@@ -144,7 +144,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, Float2D end, float duration,
+        public static Path2D[] ContinueTo(this Path2D path, Float2D end, ulong duration,
             AnimationFunctions.Function function)
         {
             return path.ToArray().ContinueTo(end, duration, function);
@@ -158,7 +158,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="delay">Starting delay</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, Float2D end, float duration, float delay)
+        public static Path2D[] ContinueTo(this Path2D path, Float2D end, ulong duration, float delay)
         {
             return path.ToArray().ContinueTo(end, duration, delay);
         }
@@ -172,7 +172,7 @@ namespace WinFormAnimation
         /// <param name="delay">Starting delay</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, Float2D end, float duration, float delay,
+        public static Path2D[] ContinueTo(this Path2D path, Float2D end, ulong duration, float delay,
             AnimationFunctions.Function function)
         {
             return path.ToArray().ContinueTo(end, duration, delay, function);
@@ -186,7 +186,7 @@ namespace WinFormAnimation
         /// <param name="endY">Vertical value of the next point to follow</param>
         /// <param name="duration">Duration of the animation</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, float duration)
+        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, ulong duration)
         {
             return path.ToArray().ContinueTo(endX, endY, duration);
         }
@@ -200,7 +200,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, float duration,
+        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, ulong duration,
             AnimationFunctions.Function function)
         {
             return path.ToArray().ContinueTo(endX, endY, duration, function);
@@ -215,7 +215,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="delay">Starting delay</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, float duration, float delay)
+        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, ulong duration, float delay)
         {
             return path.ToArray().ContinueTo(endX, endY, duration, delay);
         }
@@ -230,7 +230,7 @@ namespace WinFormAnimation
         /// <param name="delay">Starting delay</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, float duration, float delay,
+        public static Path2D[] ContinueTo(this Path2D path, float endX, float endY, ulong duration, float delay,
             AnimationFunctions.Function function)
         {
             return path.ToArray().ContinueTo(endX, endY, duration, delay, function);

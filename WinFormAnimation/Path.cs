@@ -11,7 +11,7 @@ namespace WinFormAnimation
         /// <summary>
         ///     Initializes a new instance of the <see cref="Path" /> class.
         /// </summary>
-        public Path() : this(default(float), default(float), default(float), 0, null)
+        public Path() : this(default(float), default(float), default(ulong), 0, null)
         {
         }
 
@@ -30,7 +30,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, float duration) : this(start, end, duration, 0, null)
+        public Path(float start, float end, ulong duration) : this(start, end, duration, 0, null)
         {
         }
 
@@ -52,7 +52,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, float duration, AnimationFunctions.Function function)
+        public Path(float start, float end, ulong duration, AnimationFunctions.Function function)
             : this(start, end, duration, 0, function)
         {
         }
@@ -75,7 +75,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, float duration, float delay) : this(start, end, duration, delay, null)
+        public Path(float start, float end, ulong duration, float delay) : this(start, end, duration, delay, null)
         {
         }
 
@@ -100,12 +100,8 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, float duration, float delay, AnimationFunctions.Function function)
+        public Path(float start, float end, ulong duration, float delay, AnimationFunctions.Function function)
         {
-            if (Duration < 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
             Start = start;
             End = end;
             Function = function ?? AnimationFunctions.Liner;
@@ -126,7 +122,7 @@ namespace WinFormAnimation
         /// <summary>
         ///     Gets or sets the duration in milliseconds
         /// </summary>
-        public float Duration { get; set; }
+        public ulong Duration { get; set; }
 
         /// <summary>
         ///     Gets or sets the ending value

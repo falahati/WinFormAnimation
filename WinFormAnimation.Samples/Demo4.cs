@@ -30,7 +30,7 @@ namespace WinFormAnimation.Samples
             {
                 _animators.Add(new Animator((FPSLimiterKnownValues) nud_fps.Value)
                 {
-                    Paths = new[] {new Path(rnd.Next(1000), rnd.Next(1000), (float) nud_dur.Value)}
+                    Paths = new[] {new Path(rnd.Next(1000), rnd.Next(1000), (ulong) nud_dur.Value)}
                 });
             }
             _cpuUsage = (int) _currentProcess.TotalProcessorTime.TotalMilliseconds;

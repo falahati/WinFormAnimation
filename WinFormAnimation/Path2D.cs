@@ -40,7 +40,7 @@ namespace WinFormAnimation
             float endX,
             float startY,
             float endY,
-            float duration,
+            ulong duration,
             float delay,
             AnimationFunctions.Function function)
             : this(new Path(startX, endX, duration, delay, function), new Path(startY, endY, duration, delay, function))
@@ -76,7 +76,7 @@ namespace WinFormAnimation
             float endX,
             float startY,
             float endY,
-            float duration,
+            ulong duration,
             float delay)
             : this(new Path(startX, endX, duration, delay), new Path(startY, endY, duration, delay))
         {
@@ -111,7 +111,7 @@ namespace WinFormAnimation
             float endX,
             float startY,
             float endY,
-            float duration,
+            ulong duration,
             AnimationFunctions.Function function)
             : this(new Path(startX, endX, duration, function), new Path(startY, endY, duration, function))
         {
@@ -143,7 +143,7 @@ namespace WinFormAnimation
             float endX,
             float startY,
             float endY,
-            float duration)
+            ulong duration)
             : this(new Path(startX, endX, duration), new Path(startY, endY, duration))
         {
         }
@@ -169,7 +169,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path2D(Float2D start, Float2D end, float duration, float delay, AnimationFunctions.Function function)
+        public Path2D(Float2D start, Float2D end, ulong duration, float delay, AnimationFunctions.Function function)
             : this(
                 new Path(start.X, end.X, duration, delay, function),
                 new Path(start.Y, end.Y, duration, delay, function))
@@ -194,7 +194,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path2D(Float2D start, Float2D end, float duration, float delay)
+        public Path2D(Float2D start, Float2D end, ulong duration, float delay)
             : this(
                 new Path(start.X, end.X, duration, delay),
                 new Path(start.Y, end.Y, duration, delay))
@@ -219,7 +219,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path2D(Float2D start, Float2D end, float duration, AnimationFunctions.Function function)
+        public Path2D(Float2D start, Float2D end, ulong duration, AnimationFunctions.Function function)
             : this(
                 new Path(start.X, end.X, duration, function),
                 new Path(start.Y, end.Y, duration, function))
@@ -241,7 +241,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path2D(Float2D start, Float2D end, float duration)
+        public Path2D(Float2D start, Float2D end, ulong duration)
             : this(
                 new Path(start.X, end.X, duration),
                 new Path(start.Y, end.Y, duration))

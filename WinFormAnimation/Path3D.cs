@@ -48,7 +48,7 @@ namespace WinFormAnimation
             float endY,
             float startZ,
             float endZ,
-            float duration,
+            ulong duration,
             float delay,
             AnimationFunctions.Function function)
             : this(
@@ -95,7 +95,7 @@ namespace WinFormAnimation
             float endY,
             float startZ,
             float endZ,
-            float duration,
+            ulong duration,
             float delay)
             : this(
                 new Path(startX, endX, duration, delay),
@@ -141,7 +141,7 @@ namespace WinFormAnimation
             float endY,
             float startZ,
             float endZ,
-            float duration,
+            ulong duration,
             AnimationFunctions.Function function)
             : this(
                 new Path(startX, endX, duration, function),
@@ -184,7 +184,7 @@ namespace WinFormAnimation
             float endY,
             float startZ,
             float endZ,
-            float duration)
+            ulong duration)
             : this(new Path(startX, endX, duration), new Path(startY, endY, duration), new Path(startZ, endZ, duration))
         {
         }
@@ -210,7 +210,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path3D(Float3D start, Float3D end, float duration, float delay, AnimationFunctions.Function function)
+        public Path3D(Float3D start, Float3D end, ulong duration, float delay, AnimationFunctions.Function function)
             : this(
                 new Path(start.X, end.X, duration, delay, function),
                 new Path(start.Y, end.Y, duration, delay, function),
@@ -236,7 +236,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path3D(Float3D start, Float3D end, float duration, float delay)
+        public Path3D(Float3D start, Float3D end, ulong duration, float delay)
             : this(
                 new Path(start.X, end.X, duration, delay),
                 new Path(start.Y, end.Y, duration, delay),
@@ -262,7 +262,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path3D(Float3D start, Float3D end, float duration, AnimationFunctions.Function function)
+        public Path3D(Float3D start, Float3D end, ulong duration, AnimationFunctions.Function function)
             : this(
                 new Path(start.X, end.X, duration, function),
                 new Path(start.Y, end.Y, duration, function),
@@ -285,7 +285,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path3D(Float3D start, Float3D end, float duration)
+        public Path3D(Float3D start, Float3D end, ulong duration)
             : this(
                 new Path(start.X, end.X, duration),
                 new Path(start.Y, end.Y, duration),
