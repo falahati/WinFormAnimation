@@ -41,7 +41,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="delay">Starting delay</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path[] ContinueTo(this Path[] paths, float end, ulong duration, float delay)
+        public static Path[] ContinueTo(this Path[] paths, float end, ulong duration, ulong delay)
         {
             return paths.Concat(new[] {new Path(paths.Last().End, end, duration, delay)}).ToArray();
         }
@@ -55,7 +55,7 @@ namespace WinFormAnimation
         /// <param name="delay">Starting delay</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path[] ContinueTo(this Path[] paths, float end, ulong duration, float delay,
+        public static Path[] ContinueTo(this Path[] paths, float end, ulong duration, ulong delay,
             AnimationFunctions.Function function)
         {
             return paths.Concat(new[] {new Path(paths.Last().End, end, duration, delay, function)}).ToArray();
@@ -95,7 +95,7 @@ namespace WinFormAnimation
         /// <param name="duration">Duration of the animation</param>
         /// <param name="delay">Starting delay</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path[] ContinueTo(this Path path, float end, ulong duration, float delay)
+        public static Path[] ContinueTo(this Path path, float end, ulong duration, ulong delay)
         {
             return path.ToArray().ContinueTo(end, duration, delay);
         }
@@ -109,7 +109,7 @@ namespace WinFormAnimation
         /// <param name="delay">Starting delay</param>
         /// <param name="function">Animation controller function</param>
         /// <returns>An array of paths including the newly created one</returns>
-        public static Path[] ContinueTo(this Path path, float end, ulong duration, float delay,
+        public static Path[] ContinueTo(this Path path, float end, ulong duration, ulong delay,
             AnimationFunctions.Function function)
         {
             return path.ToArray().ContinueTo(end, duration, delay, function);

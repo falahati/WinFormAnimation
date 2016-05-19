@@ -75,7 +75,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, ulong duration, float delay) : this(start, end, duration, delay, null)
+        public Path(float start, float end, ulong duration, ulong delay) : this(start, end, duration, delay, null)
         {
         }
 
@@ -100,7 +100,7 @@ namespace WinFormAnimation
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Duration is less than zero
         /// </exception>
-        public Path(float start, float end, ulong duration, float delay, AnimationFunctions.Function function)
+        public Path(float start, float end, ulong duration, ulong delay, AnimationFunctions.Function function)
         {
             Start = start;
             End = end;
@@ -117,7 +117,7 @@ namespace WinFormAnimation
         /// <summary>
         ///     Gets or sets the starting delay
         /// </summary>
-        public float Delay { get; set; }
+        public ulong Delay { get; set; }
 
         /// <summary>
         ///     Gets or sets the duration in milliseconds
