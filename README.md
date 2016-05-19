@@ -8,14 +8,14 @@ This library is available as a NuGet package at [nuget.org](https://www.nuget.or
 
 ### MAIN CLASSES
 
-* `Float2D`: A class containing two `float` values as Vertical and Horizontal coordinates representing a point in a 2D plane
-* `Float3D`: A class containing three `float` values as Vertical, Horizontal and Depth coordinates representing a point in a 3D plane
-* `Path`: A class containing a `float` starting and a `float` ending point for an animation as well as duration and the function to control the animation.
-* `Path2D`: A class containing a `Float2D` starting and a `Float2D` ending point for an animation as well as duration and the function to control the animation.
-* `Path3D`: A class containing a `Float3D` starting and a `Float3D` ending point for an animation as well as duration and the function to control the animation.
+* `Float2D`: A class containing two `float` values as Vertical and Horizontal coordinates representing a point in a 2D plane.
+* `Float3D`: A class containing three `float` values as Vertical, Horizontal and Depth coordinates representing a point in a 3D plane.
+* `Path`: A class containing a `float` starting and a `float` ending point for a single dimensional animation as well as duration and the function to control the animation.
+* `Path2D`: A class containing a `Float2D` starting and a `Float2D` ending point for a two dimensional animation as well as duration and the function to control the animation.
+* `Path3D`: A class containing a `Float3D` starting and a `Float3D` ending point for a three dimensional animation as well as duration and the function to control the animation.
 * `Animator`: A class for animating an array of `Path` objects. This class is one of the main classes and starting points of a basic animation.
-* `Animator2D`: A class for animating an array of `Path` objects. This class is one of the main classes and starting points of a basic animation.
-* `Animator2D`: A class for animating an array of `Path` objects. This class is one of the main classes and starting points of a basic animation.
+* `Animator2D`: A class for animating an array of `Path2D` objects. This class is one of the main classes and starting points of a basic animation.
+* `Animator2D`: A class for animating an array of `Path3D` objects. This class is one of the main classes and starting points of a basic animation.
 * `SafeInvoker`: A class holding a reference to a function to invoke in the correct thread, detected by a `Control` object passed to it. Useful for easier UI manipulations.
 * `SafeInvoker<T>`: Same as `SafeInvoker` class but with a generic argument for the function to invoke.
 
