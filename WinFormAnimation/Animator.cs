@@ -54,6 +54,8 @@ namespace WinFormAnimation
 
         private bool _holdEnded;
 
+        private bool _tempReverseRepeat = true;
+
         /// <summary>
         ///     The callback to get invoked at the end of the animation
         /// </summary>
@@ -310,6 +312,7 @@ namespace WinFormAnimation
             }
             ActivePath = null;
             CurrentStatus = AnimatorStatus.Stopped;
+            _tempReverseRepeat = true;
         }
 
         /// <summary>
@@ -444,11 +447,19 @@ namespace WinFormAnimation
                         _tempPaths.AddRange(_paths);
                         if (ReverseRepeat)
                         {
-                            _tempPaths.Reverse();
-                            for (var i = 0; i < _tempPaths.Count; i++)
+                            if (_tempReverseRepeat)
                             {
-                                _tempPaths[i] = _tempPaths[i].Reverse();
+                                _tempPaths.Reverse();
+                                for (var i = 0; i < _tempPaths.Count; i++)
+                                {
+                                    _tempPaths[i] = _tempPaths[i].Reverse();
+                                }
                             }
+                            _tempReverseRepeat = !_tempReverseRepeat;
+                        }
+                        else
+                        {
+                            _tempReverseRepeat = true;
                         }
                     }
                 }
