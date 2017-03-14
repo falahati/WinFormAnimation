@@ -380,76 +380,90 @@ namespace WinFormAnimation
             _timer.Start();
         }
 
-        private void Elapsed(ulong millSinceBeginning)
+        private void Elapsed(ulong millSinceBeginning = 0)
         {
-            lock (_tempPaths)
+            while (true)
             {
-                if (_tempPaths != null && ActivePath == null && _tempPaths.Count > 0)
+                lock (_tempPaths)
                 {
-                    while (ActivePath == null)
+                    if (_tempPaths != null && ActivePath == null && _tempPaths.Count > 0)
                     {
-                        if (_tempReverseRepeat)
+                        while (ActivePath == null)
                         {
-                            ActivePath = _tempPaths.LastOrDefault();
-                            _tempPaths.RemoveAt(_tempPaths.Count - 1);
+                            if (_tempReverseRepeat)
+                            {
+                                ActivePath = _tempPaths.LastOrDefault();
+                                _tempPaths.RemoveAt(_tempPaths.Count - 1);
+                            }
+                            else
+                            {
+                                ActivePath = _tempPaths.FirstOrDefault();
+                                _tempPaths.RemoveAt(0);
+                            }
+                            _timer.ResetClock();
+                            millSinceBeginning = 0;
                         }
-                        else
+                    }
+                    var ended = ActivePath == null;
+                    if (ActivePath != null)
+                    {
+                        if (!_tempReverseRepeat && millSinceBeginning < ActivePath.Delay)
                         {
-                            ActivePath = _tempPaths.FirstOrDefault();
-                            _tempPaths.RemoveAt(0);
+                            CurrentStatus = AnimatorStatus.OnHold;
+                            return;
                         }
-                        _timer.ResetClock();
-                        millSinceBeginning = 0;
+                        if (millSinceBeginning - (!_tempReverseRepeat ? ActivePath.Delay : 0) <= ActivePath.Duration)
+                        {
+                            if (CurrentStatus != AnimatorStatus.Playing)
+                            {
+                                CurrentStatus = AnimatorStatus.Playing;
+                            }
+                            var value = ActivePath.Function(_tempReverseRepeat ? ActivePath.Duration - millSinceBeginning : millSinceBeginning - ActivePath.Delay, ActivePath.Start, ActivePath.Change, ActivePath.Duration);
+                            FrameCallback.Invoke(value);
+                            return;
+                        }
+                        if (CurrentStatus == AnimatorStatus.Playing)
+                        {
+                            if (_tempPaths.Count == 0)
+                            {
+                                // For the last path, we make sure that control is in end point
+                                FrameCallback.Invoke(_tempReverseRepeat ? ActivePath.Start : ActivePath.End);
+                                ended = true;
+                            }
+                            else
+                            {
+                                if ((_tempReverseRepeat && ActivePath.Delay > 0) || !_tempReverseRepeat && _tempPaths.FirstOrDefault()?.Delay > 0)
+                                {
+                                    // Or if the next path or this one in revese order has a delay
+                                    FrameCallback.Invoke(_tempReverseRepeat ? ActivePath.Start : ActivePath.End);
+                                }
+                            }
+                        }
+                        if (_tempReverseRepeat && (millSinceBeginning - ActivePath.Duration) < ActivePath.Delay)
+                        {
+                            CurrentStatus = AnimatorStatus.OnHold;
+                            return;
+                        }
+                        ActivePath = null;
+                    }
+                    if (!ended)
+                    {
+                        return;
                     }
                 }
-                if (ActivePath != null)
-                {
-                    if (!_tempReverseRepeat && millSinceBeginning < ActivePath.Delay)
-                    {
-                        CurrentStatus = AnimatorStatus.OnHold;
-                        return;
-                    }
-                    if (millSinceBeginning - (!_tempReverseRepeat ? ActivePath.Delay : 0) <= ActivePath.Duration)
-                    {
-                        if (CurrentStatus != AnimatorStatus.Playing)
-                        {
-                            FrameCallback.Invoke(_tempReverseRepeat ? ActivePath.End : ActivePath.Start);
-                            CurrentStatus = AnimatorStatus.Playing;
-                        }
-                        var value = ActivePath.Function(
-                            _tempReverseRepeat
-                                ? ActivePath.Duration - millSinceBeginning
-                                : millSinceBeginning - ActivePath.Delay,
-                            ActivePath.Start,
-                            ActivePath.Change,
-                            ActivePath.Duration);
-                        FrameCallback.Invoke(value);
-                        return;
-                    }
-                    if (CurrentStatus == AnimatorStatus.Playing)
-                    {
-                        FrameCallback.Invoke(_tempReverseRepeat ? ActivePath.Start : ActivePath.End);
-                    }
-                    if (_tempReverseRepeat && (millSinceBeginning - ActivePath.Duration) < ActivePath.Delay)
-                    {
-                        CurrentStatus = AnimatorStatus.OnHold;
-                        return;
-                    }
-                    ActivePath = null;
-                }
-                else if (Repeat)
+                if (Repeat)
                 {
                     lock (_tempPaths)
                     {
                         _tempPaths.AddRange(_paths);
                         _tempReverseRepeat = ReverseRepeat && !_tempReverseRepeat;
                     }
+                    millSinceBeginning = 0;
+                    continue;
                 }
-                else
-                {
-                    Stop();
-                    EndCallback?.Invoke();
-                }
+                Stop();
+                EndCallback?.Invoke();
+                break;
             }
         }
     }
