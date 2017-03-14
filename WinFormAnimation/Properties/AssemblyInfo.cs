@@ -8,14 +8,14 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("WinForm Animation Library")]
 [assembly:
     AssemblyDescription(
-        "A simple library for animating controls/values in .Net WinForm (.Net 3.5 and later). Keyframe (Path) based and fully customizable."
+        "A simple library for animating controls/values in .Net using key-frames (.Net 3.5 and later)."
         )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Soroush Falahati")]
 [assembly: AssemblyProduct("WinForm Animation Library")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Soroush Falahati")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyCulture("en")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -36,5 +36,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.3.0.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.5.*")]
+[assembly: AssemblyFileVersion("1.5")]
