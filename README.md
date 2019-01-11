@@ -3,10 +3,13 @@ A simple library for animating controls/values in .Net WinForm (.Net 3.5 and lat
 
 *Please note that even though this library designed for WinForm but its usage is not limited to WinForm and can be used in other environments. Only reference of the library is to 'System.Drawing' name space.*
 
-### WHERE TO FIND
+## WHERE TO FIND
 This library is available as a NuGet package at [nuget.org](https://www.nuget.org/packages/WinFormAnimation/).
 
-### MAIN CLASSES
+## DONATION
+[<img width="24" height="24" src="http://icons.iconarchive.com/icons/sonya/swarm/256/Coffee-icon.png"/>**Every coffee counts! :)**](https://www.coinpayments.net/index.php?cmd=_donate&reset=1&merchant=820707aded07845511b841f9c4c335cd&item_name=Donate&currency=USD&amountf=10.00000000&allow_amount=1&want_shipping=0&allow_extra=1)
+
+## MAIN CLASSES
 
 * `Float2D`: A class containing two `float` values as Vertical and Horizontal coordinates representing a point in a 2D plane.
 * `Float3D`: A class containing three `float` values as Vertical, Horizontal and Depth coordinates representing a point in a 3D plane.
@@ -21,15 +24,15 @@ This library is available as a NuGet package at [nuget.org](https://www.nuget.or
 
 For full documentation of the classes and their members, please take a look at our doxygen page at [falahati.github.io](https://falahati.github.io/WinFormAnimation/doxygen).
 
-#### BASIC EXAMPLES
-##### ONE DIMENSIONAL ANIMATION OF A PROPERTY
+## BASIC EXAMPLES
+### ONE DIMENSIONAL ANIMATION OF A PROPERTY
 Following code animates a property named `Value` of a `ProgressBar` named `pb_progress` in 5 seconds from zero to one hundred:
 ```C#
 new Animator(new Path(0, 100, 5000))
     .Play(pb_progress, Animator.KnownProperties.Value);
 ```
 
-##### TWO DIMENSIONAL ANIMATION OF A PROPERTY
+### TWO DIMENSIONAL ANIMATION OF A PROPERTY
 Following code animates a `Form` in two paths. First one moves the `Form` from (0, -100) to (100, 200) and second path waits for 3 seconds and then moved the `Form` to its initial location in 2 seconds. (`this` is a `Form`)
 ```C#
 new Animator2D(
@@ -37,7 +40,7 @@ new Animator2D(
     .Play(this, Animator2D.KnownProperties.Location);
 ```
 
-##### THREE DIMENSIONAL ANIMATION OF A PROPERTY
+### THREE DIMENSIONAL ANIMATION OF A PROPERTY
 Following code animates a property named `CustomColor` of a `Control` named `c_customLabel` in 2 seconds and after a delay of 1 second using the `AnimationFunctions.CubicEaseIn` function and with maximum of 10 frames per second.
 ```C#
 new Animator3D(
@@ -47,7 +50,7 @@ new Animator3D(
 ```
 
 
-##### KEYFRAMES
+### KEYFRAMES
 There are extension methods for `Path`, `Path2D`, `Path3D` and their arrays to let you continue the path easily and define the key frames as fast as possible. For example, following code moves a `Control` named `c_control` in a rectangular path infinitely:
 ```C#
 new Animator2D(
@@ -60,7 +63,7 @@ new Animator2D(
 }.Play(c_control, Animator2D.KnownProperties.Location);
 ```
 
-##### CALLBACKS
+### CALLBACKS
 It is possible to define a custom callback as frame handler as well as defining a call back to handle the end of the animation. Following example will call a method named `CustomSetMethod` for setting new values and handle the frames, and starts the animation in reverse path after its end for one more time:
 
 ```C#
@@ -72,11 +75,11 @@ animator.Play(new SafeInvoker<float>(CustomSetMethod), new SafeInvoker(() =>
 }));
 ```
 
-#### DEMO PROJECT
+## DEMO PROJECT
 Check the 'WinFormAnimation.Samples' project for simple usage examples.
 ![Screenshot](/screenshot.gif?raw=true "Screenshot")
 
-### LICENSE
+## LICENSE
 The MIT License (MIT)
 
 Copyright (c) 2016 Soroush Falahati
