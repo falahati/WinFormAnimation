@@ -71,7 +71,7 @@ namespace WinFormAnimation
                         "Invoke",
                         BindingFlags.Instance | BindingFlags.Public,
                         Type.DefaultBinder,
-                        new[] {typeof (Delegate)},
+                        new[] {typeof(Delegate)},
                         null);
                 if (_invokeRequiredProperty != null && _invokeMethod != null)
                 {
@@ -105,16 +105,23 @@ namespace WinFormAnimation
                 ThreadPool.QueueUserWorkItem(
                     state =>
                     {
-                        if (TargetControl != null && (bool) _invokeRequiredProperty.GetValue(TargetControl, null))
+                        try
                         {
-                            _invokeMethod.Invoke(
-                                TargetControl,
-                                new object[]
-                                {
+                            if (TargetControl != null && (bool)_invokeRequiredProperty.GetValue(TargetControl, null))
+                            {
+                                _invokeMethod.Invoke(
+                                    TargetControl,
+                                    new object[]
+                                    {
                                     new Action(
                                         () => UnderlyingDelegate.DynamicInvoke(value != null ? new[] {value} : null))
-                                });
-                            return;
+                                    });
+                                return;
+                            }
+                        }
+                        catch
+                        {
+                            // ignored
                         }
                         UnderlyingDelegate.DynamicInvoke(value != null ? new[] {value} : null);
                     });
