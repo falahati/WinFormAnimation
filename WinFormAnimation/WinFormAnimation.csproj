@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net4</TargetFrameworks>
     <PackageId>WinFormAnimation</PackageId>
-    <Version>1.6.0.2</Version>
+    <Version>1.6.0.4</Version>
     <Authors>Soroush Falahati</Authors>
     <Description>A simple library for animating controls/values in .Net using key-frames.</Description>
     <PackageLicenseUrl>https://github.com/falahati/WinFormAnimation/blob/master/LICENSE</PackageLicenseUrl>
