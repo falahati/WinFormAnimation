@@ -7,24 +7,23 @@ A simple library for animating controls/values in .Net WinForm (.Net 3.5 and lat
 
 *Please note that even though this library designed for WinForm but its usage is not limited to WinForm and can be used in other environments. Only reference of the library is to 'System.Drawing' name space.*
 
-## WHERE TO FIND
+## How to get
 [![](https://img.shields.io/nuget/dt/WinFormAnimation.svg?style=flat-square)](https://www.nuget.org/packages/WinFormAnimation)
 [![](https://img.shields.io/nuget/v/WinFormAnimation.svg?style=flat-square)](https://www.nuget.org/packages/WinFormAnimation)
 
 This library is available as a NuGet package at [nuget.org](https://www.nuget.org/packages/WinFormAnimation/).
 
-## DONATION
-Donations assist development and are greatly appreciated; also always remember that [every coffee counts!](https://media.makeameme.org/created/one-simply-does-i9k8kx.jpg) :)
+## Help me fund my own Death Star
 
-[![](https://img.shields.io/badge/fiat-PayPal-8a00a3.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WR3KK2B6TYYQ4&item_name=Donation&currency_code=USD&source=url)
 [![](https://img.shields.io/badge/crypto-CoinPayments-8a00a3.svg?style=flat-square)](https://www.coinpayments.net/index.php?cmd=_donate&reset=1&merchant=820707aded07845511b841f9c4c335cd&item_name=Donate&currency=USD&amountf=20.00000000&allow_amount=1&want_shipping=0&allow_extra=1)
 [![](https://img.shields.io/badge/shetab-ZarinPal-8a00a3.svg?style=flat-square)](https://zarinp.al/@falahati)
+[![](https://img.shields.io/badge/usd-Paypal-8a00a3.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ramin.graphix@gmail.com&lc=US&item_name=Donate&no_note=0&cn=&curency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted)
 
 **--OR--**
 
-You can always donate your time by contributing to the project or by introducing it to others.
+You can always donate your time by contributing to the project or by introducing it to others..
 
-## MAIN CLASSES
+## Documentation
 
 * `Float2D`: A class containing two `float` values as Vertical and Horizontal coordinates representing a point in a 2D plane.
 * `Float3D`: A class containing three `float` values as Vertical, Horizontal and Depth coordinates representing a point in a 3D plane.
@@ -39,7 +38,7 @@ You can always donate your time by contributing to the project or by introducing
 
 For full documentation of the classes and their members, please take a look at our doxygen page at [falahati.github.io](https://falahati.github.io/WinFormAnimation/doxygen).
 
-## BASIC EXAMPLES
+## Basic examples
 ### ONE DIMENSIONAL ANIMATION OF A PROPERTY
 Following code animates a property named `Value` of a `ProgressBar` named `pb_progress` in 5 seconds from zero to one hundred:
 ```C#
@@ -90,14 +89,14 @@ animator.Play(new SafeInvoker<float>(CustomSetMethod), new SafeInvoker(() =>
 }));
 ```
 
-## DEMO PROJECT
+## Demo
 Check the 'WinFormAnimation.Samples' project for simple usage examples.
 ![Screenshot](/screenshot.gif?raw=true "Screenshot")
 
-## LICENSE
+## License
 The MIT License (MIT)
 
-Copyright (c) 2016 Soroush Falahati
+Copyright (c) 2016-2020 Soroush Falahati
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
