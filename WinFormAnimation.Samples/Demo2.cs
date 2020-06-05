@@ -15,7 +15,7 @@ namespace WinFormAnimation.Samples
                 new Path(5, 100, 2000, AnimationFunctions.CubicEaseIn))
                 .ContinueTo(new Path2D(
                     new Path(320, 70, 2000, 300, AnimationFunctions.ExponentialEaseInOut),
-                    new Path(100, 5, 1700, 600, AnimationFunctions.Liner)));
+                    new Path(100, 5, 1700, 600, AnimationFunctions.Linear)));
         }
 
         private void PlayButton(object sender, EventArgs e)

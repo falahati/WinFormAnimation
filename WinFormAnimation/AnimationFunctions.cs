@@ -42,8 +42,8 @@ namespace WinFormAnimation
                     return CubicEaseInOut;
                 case KnownAnimationFunctions.CubicEaseOut:
                     return CubicEaseOut;
-                case KnownAnimationFunctions.Liner:
-                    return Liner;
+                case KnownAnimationFunctions.Linear:
+                    return Linear;
                 case KnownAnimationFunctions.CircularEaseInOut:
                     return CircularEaseInOut;
                 case KnownAnimationFunctions.CircularEaseIn:
@@ -165,7 +165,7 @@ namespace WinFormAnimation
         }
 
         /// <summary>
-        ///     The liner animation function.
+        ///     The linear animation function.
         /// </summary>
         /// <param name="t">
         ///     The time of the animation.
@@ -182,7 +182,7 @@ namespace WinFormAnimation
         /// <returns>
         ///     The calculated current value of the animation
         /// </returns>
-        public static float Liner(float t, float b, float c, float d)
+        public static float Linear(float t, float b, float c, float d)
         {
             return c*t/d + b;
         }

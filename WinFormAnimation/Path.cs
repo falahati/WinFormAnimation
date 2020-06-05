@@ -104,7 +104,7 @@ namespace WinFormAnimation
         {
             Start = start;
             End = end;
-            Function = function ?? AnimationFunctions.Liner;
+            Function = function ?? AnimationFunctions.Linear;
             Duration = duration;
             Delay = delay;
         }

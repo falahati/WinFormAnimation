@@ -26,9 +26,9 @@
         CubicEaseOut,
 
         /// <summary>
-        ///     The liner animation function.
+        ///     The linear animation function.
         /// </summary>
-        Liner,
+        Linear,
 
         /// <summary>
         ///     The circular ease-in and ease-out animation function.
